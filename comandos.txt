@@ -3,3 +3,5 @@ npx expo install react-native-screens react-native-safe-area-context
 
 npm install @react-navigation/native-stack
 
+#Dica Tailwind:
+    - arquivos do sistema precisam ser enxergados em tailwind.config.js.
