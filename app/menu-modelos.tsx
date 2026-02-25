@@ -7,7 +7,7 @@ import { api } from "../utils/axios";
 import { router } from 'expo-router';
 
 
-export default function MenuCategorias() {
+export default function MenuModelos() {
 
     const categories = [
         { id: 1, title: 'Categoria 1', description: 'Descrição da categoria 1' },
@@ -17,8 +17,7 @@ export default function MenuCategorias() {
 
     return(
         <ScrollView className="flex-1 bg-white p-4">
-            <Text className="text-2xl font-bold mb-2 mt-16">Categorias</Text>
-            <Text className="text-md font-bold mb-6 text-gray-400">Escolha uma categoria</Text>
+            <Text className="text-2xl font-bold mb-6 mt-16">Categorias</Text>
             
             <View className="gap-4">
                 {categories.map((category) => (

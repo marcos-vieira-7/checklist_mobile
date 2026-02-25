@@ -125,7 +125,7 @@ export default function Login() {
             }
             console.log("Navegando para menu categorias");
             try {
-                router.navigate('/menu-categorias');
+                router.navigate('/minhas-checklists');
             } catch (error) {
                 console.log("Erro ao navegar para menu categorias: " + error);
             }

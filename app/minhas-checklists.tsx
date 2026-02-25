@@ -7,35 +7,39 @@ import { api } from "../utils/axios";
 import { router } from 'expo-router';
 
 
-export default function MenuCategorias() {
+export default function MinhasChecklists() {
 
-    const categories = [
-        { id: 1, title: 'Categoria 1', description: 'Descrição da categoria 1' },
-        { id: 2, title: 'Categoria 2', description: 'Descrição da categoria 2' },
-        { id: 3, title: 'Categoria 3', description: 'Descrição da categoria 3' },
-    ];
+    const checklists = [
+        { id: 1, data: '25/02/2026', categoria: 'Segurança do trabalho' },
+        { id: 2, data: '20/02/2026', categoria: 'Qualidade' },
+        { id: 3, data: '15/02/2026', categoria: 'Preventiva' },
+    ]
 
     return(
         <ScrollView className="flex-1 bg-white p-4">
-            <Text className="text-2xl font-bold mb-2 mt-16">Categorias</Text>
-            <Text className="text-md font-bold mb-6 text-gray-400">Escolha uma categoria</Text>
-            
+            <Text className="text-2xl font-bold mb-6 mt-16">Minhas Checklists</Text>
+
+            <Pressable onPress={() => router.navigate('/menu-categorias')} className="mb-4 bg-gray-200 border rounded-lg p-4 items-center">
+                <Text className=" text-black border-black p-2 font-bold">Nova Checklist</Text>
+            </Pressable>
+
             <View className="gap-4">
-                {categories.map((category) => (
+                {checklists.map((checklist) => (
                     <Pressable
-                        key={category.id}
+                        key={checklist.id}
                         onPress={() => null} //router.push(`/categoria/${category.id}`)
-                        className="bg-blue-500 rounded-lg p-6 h-32 justify-center"
+                        className="bg-blue-500  rounded-lg p-6 h-32 justify-center"
                     >
                         <Text className="text-white text-xl font-bold">
-                            {category.title}
+                            {checklist.data}
                         </Text>
                         <Text className="text-blue-100 text-sm mt-2">
-                            {category.description}
+                            {checklist.categoria}
                         </Text>
                     </Pressable>
                 ))}
             </View>
+
         </ScrollView>
     );
 
