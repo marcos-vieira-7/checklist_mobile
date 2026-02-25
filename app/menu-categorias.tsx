@@ -10,9 +10,9 @@ import { router } from 'expo-router';
 export default function MenuCategorias() {
 
     const categories = [
-        { id: 1, title: 'Categoria 1', description: 'Descrição da categoria 1' },
-        { id: 2, title: 'Categoria 2', description: 'Descrição da categoria 2' },
-        { id: 3, title: 'Categoria 3', description: 'Descrição da categoria 3' },
+        { id: 1, title: 'Segurança do Trabalho', description: 'Descrição da categoria 1' },
+        { id: 2, title: 'Qualidade de Concreto', description: 'Descrição da categoria 2' },
+        { id: 3, title: 'Manutenção Preventiva', description: 'Descrição da categoria 3' },
     ];
 
     return(
@@ -24,7 +24,7 @@ export default function MenuCategorias() {
                 {categories.map((category) => (
                     <Pressable
                         key={category.id}
-                        onPress={() => null} //router.push(`/categoria/${category.id}`)
+                        onPress={() => router.navigate('/menu-modelos')}
                         className="bg-blue-500 rounded-lg p-6 h-32 justify-center"
                     >
                         <Text className="text-white text-xl font-bold">
