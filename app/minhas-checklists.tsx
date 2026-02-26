@@ -19,8 +19,10 @@ export default function MinhasChecklists() {
         <ScrollView className="flex-1 bg-white p-4">
             <Text className="text-2xl font-bold mb-6 mt-16">Minhas Checklists</Text>
 
-            <Pressable onPress={() => router.navigate('/menu-categorias')} className="mb-4 bg-gray-200 border rounded-lg p-4 items-center">
-                <Text className=" text-black border-black p-2 font-bold">Nova Checklist</Text>
+            <Pressable
+                onPress={() => router.navigate('/menu-categorias')}
+                className="mb-4 bg-gray-200 border border-dashed border-gray-400 rounded-lg p-4 items-center">
+                <Text className="text-black p-2 font-bold text-xl">+  Nova Checklist</Text>
             </Pressable>
 
             <View className="gap-4">

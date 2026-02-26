@@ -12,6 +12,7 @@ export default function RootLayout() {
       <Stack.Screen name="menu-categorias"/>
       <Stack.Screen name="minhas-checklists"/>
       <Stack.Screen name="menu-modelos"/>
+      <Stack.Screen name="form-checklist"/>
     </Stack>
   );
 }
