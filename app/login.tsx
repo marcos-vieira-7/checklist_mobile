@@ -47,22 +47,22 @@ export default function Login() {
         setForgotPassword(false);
     };
 
-    // const realizarRecuperacaoSenha = async () => {
-    //     if (!emailRecuperacao) {
-    //         Alert.alert("Digite o usuário para realizar a recuperação de senha.");
-    //     }
-
-    //     const response = await recoverPassword(emailRecuperacao);
-
-    //     if (!response) {
-    //         Alert.alert("Falha ao recuperar senha", "Consulte o log do aplicativo para mais informações");
-    //         return;
-    //     }
-    //     if (response) {
-    //         console.log("Código enviado para o e-mail");
-    //         setCodeSent(true);
-    //     }
-    // }
+    const realizarRecuperacaoSenha = async () => {
+        if (!emailRecuperacao) {
+            Alert.alert("Digite o usuário para realizar a recuperação de senha.");
+        }
+        //TODO:
+        //const response = await recoverPassword(emailRecuperacao);
+        const response = true;
+        if (!response) {
+            Alert.alert("Falha ao recuperar senha", "Consulte o log do aplicativo para mais informações");
+            return;
+        }
+        if (response) {
+            console.log("Código enviado para o e-mail");
+            setCodeSent(true);
+        }
+    }
 
     // const checkSession = async () => {
     //     const token = await getSession("token");
@@ -81,23 +81,27 @@ export default function Login() {
     //     }
     // }
 
-    // const handleConfirmPassword = async () => {
-    //     if (newPassword != confirmNewPassword) {
-    //         Alert.alert("As senhas não conferem", "A nova confirmação de senha deve ser igual a nova senha");
-    //         return;
-    //     }
-    //     const response = await resetPassword(codeRecover, newPassword, confirmNewPassword);
-    //     if (response) {
-    //         setCodeSent(false);
-    //         setForgotPassword(false);
-    //         setNewPassword("");
-    //         setConfirmNewPassword("");
-    //         setCodeRecover("");
-    //         if (Platform.OS == 'android') {
-    //             ToastAndroid.show("Senha alterada com sucesso!", ToastAndroid.LONG);
-    //         }
-    //     }
-    // }
+    const handleConfirmPassword = async () => {
+        if (newPassword != confirmNewPassword) {
+            Alert.alert("As senhas não conferem", "A nova confirmação de senha deve ser igual a nova senha");
+            return;
+        }
+        //TODO:
+        // const response = await resetPassword(codeRecover, newPassword, confirmNewPassword);
+        const response = true;
+        if (response) {
+            setCodeSent(false);
+            setForgotPassword(false);
+            setNewPassword("");
+            setConfirmNewPassword("");
+            setCodeRecover("");
+            if (Platform.OS == 'android') {
+                ToastAndroid.show("Senha alterada com sucesso!", ToastAndroid.LONG);
+            } else {
+                Alert.alert("Senha alterada com sucesso!");
+            }
+        }
+    }
 
     const realizarLogin = async () => {
 
@@ -151,16 +155,16 @@ export default function Login() {
                 resizeMode="contain" // Ajusta a imagem para caber dentro do container sem cortar
             />
 
-        {/* {codeSent ? */}
-            {/* <View>
+        {codeSent ?
+            <View>
                 <Text>Informe o código recebido em seu e-mail e a nova senha:</Text>
                 <Input value={codeRecover} onChangeText={setCodeRecover} placeholder='Código' class="mt-6 mb-6" />
                 <Input value={newPassword} onChangeText={setNewPassword} secureTextEntry placeholder='Nova senha' class="mt-6 mb-6" />
                 <Input value={confirmNewPassword} onChangeText={setConfirmNewPassword} secureTextEntry placeholder='Confirmação da nova senha' class="mt-6 mb-6" />
 
                 <Button onPress={handleConfirmPassword}><Text className="color-slate-50 font-bold">Alterar Senha</Text></Button>
-            </View> */}
-            {/* : forgotPassword ?
+            </View>
+            : forgotPassword ?
                 <View>
                     <Text>Digite seu usuário para recuperação de senha:</Text>
                     <Input value={emailRecuperacao} onChangeText={setEmailRecuperacao} placeholder='Usuário' class="mt-6 mb-6" />
@@ -168,7 +172,7 @@ export default function Login() {
                     <Button onPress={realizarRecuperacaoSenha}><Text className="color-slate-50 font-bold">Enviar código</Text></Button>
                     <Button onPress={cancelaForgotPassword} class="mt-6 bg-red-600"><Text className="color-slate-50 font-bold">Cancelar</Text></Button>
                 </View>
-                : */}
+                :
                 <View className='flex flex-col items-center'>
                     <Input value={login} onChangeText={setLogin} placeholder='Login' class="mt-6 mb-6" />
                     <Input value={password} onChangeText={setPassword} placeholder='Senha' secureTextEntry class="mb-6" />
@@ -179,7 +183,7 @@ export default function Login() {
                         <Text className="mt-20 color-blue-500">Esqueceu a senha?</Text>
                     </Pressable>
                 </View>
-        {/* } */}
+        }
         <Text className="absolute bottom-2">Versão: 0.00</Text>
         </View>
     );
