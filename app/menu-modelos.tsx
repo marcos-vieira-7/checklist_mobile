@@ -5,6 +5,7 @@ import Button from "./components/Button";
 import { api } from "../utils/axios";
 // import { router, useLocalSearchParams } from "expo-router";
 import { router } from 'expo-router';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function MenuModelos() {
@@ -16,23 +17,31 @@ export default function MenuModelos() {
     ];
 
     return(
-        <ScrollView className="flex-1 bg-white p-4">
-            <Text className="text-2xl font-bold mb-2 mt-16">Modelos</Text>
-            <Text className="text-md font-bold mb-6 text-gray-400">Escolha um modelo</Text>
-            
-            <View className="gap-4">
-                {modelos.map((modelo) => (
-                    <Pressable
-                        key={modelo.id}
-                        onPress={() => router.navigate('form-checklist')} //router.push(`/categoria/${category.id}`)
-                        className="bg-blue-500 rounded-lg p-6 h-32 justify-center">
-                        <Text className="text-white text-xl font-bold">
-                            {modelo.title}
-                        </Text>
-                    </Pressable>
-                ))}
-            </View>
-        </ScrollView>
+        <View className="flex-1">
+            <StatusBar
+            backgroundColor="#1976D2"
+            translucent={false}
+            />
+            <SafeAreaView className="flex-1 bg-white">
+            <ScrollView className="flex-1 bg-white p-4">
+                <Text className="text-2xl font-bold mb-2 mt-4">Modelos</Text>
+                <Text className="text-md font-bold mb-6 text-gray-400">Escolha um modelo</Text>
+                
+                <View className="gap-4">
+                    {modelos.map((modelo) => (
+                        <Pressable
+                            key={modelo.id}
+                            onPress={() => router.navigate('form-checklist')} //router.push(`/categoria/${category.id}`)
+                            className="bg-blue-500 rounded-lg p-6 h-32 justify-center">
+                            <Text className="text-white text-xl font-bold">
+                                {modelo.title}
+                            </Text>
+                        </Pressable>
+                    ))}
+                </View>
+            </ScrollView>
+            </SafeAreaView>
+        </View>
     );
 
 }

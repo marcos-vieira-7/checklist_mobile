@@ -5,6 +5,7 @@ import Button from "./components/Button";
 import { api } from "../utils/axios";
 // import { router, useLocalSearchParams } from "expo-router";
 import { router } from 'expo-router';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type Questao = {
     id: string;
@@ -81,124 +82,132 @@ export default function FormChecklist() {
     }
 
     return(
-        <ScrollView className="flex-1 bg-white p-4">
-            <Text className="text-2xl font-bold mb-6 mt-16">CheckList</Text>
-            <Text className="text-md font-bold mb-6 text-gray-400">Preencha as informações</Text>
-            
-            {/* Need a loading bar based number of questions asked to 100% */}
-            <View className="mb-4">
-                <Text className="text-right text-xs text-gray-500 mb-1">
-                    {Math.round((questoes.filter(q => q.resposta).length / questoes.length * 100))}%
-                </Text>
-                <View className="w-full bg-gray-200 rounded-full h-2.5">
-                    <View 
-                        className="bg-green-600 h-2.5 rounded-full" 
-                        style={{ width: `${(questoes.filter(q => q.resposta).length / questoes.length * 100)}%` }}
-                    />
-                </View>
-            </View>
-
-            <View className="gap-4">
-            {questoes.map((questao) => (
-                <View
-                key={questao.id}
-                className="bg-white rounded-xl p-5 shadow-md border border-gray-200"
-                >
-                {/* TÍTULO */}
-                <Text className="text-lg font-bold text-gray-800 mb-4">
-                    {questao.titulo}
-                </Text>
-
-                {/* BOTÕES */}
-                <View className="flex-row justify-between gap-2 mb-3">
-
-                    {/* C */}
-                    <Pressable
-                    onPress={() => selecionarResposta(questao.id, 'C')}
-                    className={`flex-1 py-3 rounded-lg items-center ${
-                        questao.resposta === 'C'
-                        ? 'bg-green-600'
-                        : 'bg-green-200'
-                    }`}
-                    >
-                    <Text className="font-bold text-white">C</Text>
-                    </Pressable>
-
-                    {/* NC */}
-                    <Pressable
-                    onPress={() => selecionarResposta(questao.id, 'NC')}
-                    className={`flex-1 py-3 rounded-lg items-center ${
-                        questao.resposta === 'NC'
-                        ? 'bg-red-600'
-                        : 'bg-red-200'
-                    }`}
-                    >
-                    <Text className="font-bold text-white">NC</Text>
-                    </Pressable>
-
-                    {/* NA */}
-                    <Pressable
-                    onPress={() => selecionarResposta(questao.id, 'NA')}
-                    className={`flex-1 py-3 rounded-lg items-center ${
-                        questao.resposta === 'NA'
-                        ? 'bg-gray-700'
-                        : 'bg-gray-300'
-                    }`}
-                    >
-                    <Text className="font-bold text-white">NA</Text>
-                    </Pressable>
+        <View className="flex-1">
+            <StatusBar
+            backgroundColor="#1976D2"
+            translucent={false} // 🔥 ISSO RESOLVE
+            />
+            <SafeAreaView className="flex-1 bg-white">
+            <ScrollView className="flex-1 bg-white p-4">
+                <Text className="text-2xl font-bold mb-6 mt-2">CheckList</Text>
+                <Text className="text-md font-bold mb-6 text-gray-400">Preencha as informações</Text>
+                
+                {/* Need a loading bar based number of questions asked to 100% */}
+                <View className="mb-4">
+                    <Text className="text-right text-xs text-gray-500 mb-1">
+                        {Math.round((questoes.filter(q => q.resposta).length / questoes.length * 100))}%
+                    </Text>
+                    <View className="w-full bg-gray-200 rounded-full h-2.5">
+                        <View 
+                            className="bg-green-600 h-2.5 rounded-full" 
+                            style={{ width: `${(questoes.filter(q => q.resposta).length / questoes.length * 100)}%` }}
+                        />
+                    </View>
                 </View>
 
-                {/* SE FOR NÃO CONFORME */}
-                {questao.resposta === 'NC' && (
-                    <View className="mt-2 gap-3">
+                <View className="gap-4">
+                {questoes.map((questao) => (
+                    <View
+                    key={questao.id}
+                    className="bg-white rounded-xl p-5 shadow-md border border-gray-200"
+                    >
+                    {/* TÍTULO */}
+                    <Text className="text-lg font-bold text-gray-800 mb-4">
+                        {questao.titulo}
+                    </Text>
 
-                    {/* Campo Observação */}
-                    <TextInput
-                        placeholder="Descreva o problema..."
-                        multiline
-                        value={questao.observacao}
-                        onChangeText={(text) =>
-                        atualizarQuestao(questao.id, { observacao: text })
-                        }
-                        className="border border-gray-300 rounded-lg p-3 min-h-[80px] text-gray-800"
-                    />
+                    {/* BOTÕES */}
+                    <View className="flex-row justify-between gap-2 mb-3">
 
-                    {/* Botões Foto e Vídeo */}
-                    <View className="flex-row gap-3">
-
+                        {/* C */}
                         <Pressable
-                        onPress={() => console.log('Adicionar Foto')}
-                        className="flex-1 bg-blue-600 py-3 rounded-lg items-center"
+                        onPress={() => selecionarResposta(questao.id, 'C')}
+                        className={`flex-1 py-3 rounded-lg items-center ${
+                            questao.resposta === 'C'
+                            ? 'bg-green-600'
+                            : 'bg-green-200'
+                        }`}
                         >
-                        <Text className="text-white font-semibold">
-                            📷 Add Foto
-                        </Text>
+                        <Text className="font-bold text-white">C</Text>
                         </Pressable>
 
+                        {/* NC */}
                         <Pressable
-                        onPress={() => console.log('Adicionar Vídeo')}
-                        className="flex-1 bg-purple-600 py-3 rounded-lg items-center"
+                        onPress={() => selecionarResposta(questao.id, 'NC')}
+                        className={`flex-1 py-3 rounded-lg items-center ${
+                            questao.resposta === 'NC'
+                            ? 'bg-red-600'
+                            : 'bg-red-200'
+                        }`}
                         >
-                        <Text className="text-white font-semibold">
-                            🎥 Add Vídeo
-                        </Text>
+                        <Text className="font-bold text-white">NC</Text>
                         </Pressable>
 
+                        {/* NA */}
+                        <Pressable
+                        onPress={() => selecionarResposta(questao.id, 'NA')}
+                        className={`flex-1 py-3 rounded-lg items-center ${
+                            questao.resposta === 'NA'
+                            ? 'bg-gray-700'
+                            : 'bg-gray-300'
+                        }`}
+                        >
+                        <Text className="font-bold text-white">NA</Text>
+                        </Pressable>
                     </View>
 
+                    {/* SE FOR NÃO CONFORME */}
+                    {questao.resposta === 'NC' && (
+                        <View className="mt-2 gap-3">
+
+                        {/* Campo Observação */}
+                        <TextInput
+                            placeholder="Descreva o problema..."
+                            multiline
+                            value={questao.observacao}
+                            onChangeText={(text) =>
+                            atualizarQuestao(questao.id, { observacao: text })
+                            }
+                            className="border border-gray-300 rounded-lg p-3 min-h-[80px] text-gray-800"
+                        />
+
+                        {/* Botões Foto e Vídeo */}
+                        <View className="flex-row gap-3">
+
+                            <Pressable
+                            onPress={() => console.log('Adicionar Foto')}
+                            className="flex-1 bg-blue-600 py-3 rounded-lg items-center"
+                            >
+                            <Text className="text-white font-semibold">
+                                📷 Add Foto
+                            </Text>
+                            </Pressable>
+
+                            <Pressable
+                            onPress={() => console.log('Adicionar Vídeo')}
+                            className="flex-1 bg-purple-600 py-3 rounded-lg items-center"
+                            >
+                            <Text className="text-white font-semibold">
+                                🎥 Add Vídeo
+                            </Text>
+                            </Pressable>
+
+                        </View>
+
+                        </View>
+                    )}
                     </View>
-                )}
+                ))}
                 </View>
-            ))}
-            </View>
 
-            <View className="mt-6 mb-10">
-                <Button onPress={() => Alert.alert("Checklist Enviado com Sucesso!")} disabled={isSubmitting} class="bg-green-600">
-                    <Text className="text-white font-bold">{isSubmitting ? 'Enviando...' : 'Enviar'}</Text>
-                </Button>
-            </View>
-        </ScrollView>
+                <View className="mt-6 mb-10">
+                    <Button onPress={() => Alert.alert("Checklist Enviado com Sucesso!")} disabled={isSubmitting} class="bg-green-600">
+                        <Text className="text-white font-bold">{isSubmitting ? 'Enviando...' : 'Enviar'}</Text>
+                    </Button>
+                </View>
+            </ScrollView>
+            </SafeAreaView>
+        </View>
     );
 
 }

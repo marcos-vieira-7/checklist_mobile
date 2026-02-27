@@ -5,6 +5,7 @@ import Button from "./components/Button";
 import { api } from "../utils/axios";
 // import { router, useLocalSearchParams } from "expo-router";
 import { router } from 'expo-router';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function MinhasChecklists() {
@@ -16,8 +17,13 @@ export default function MinhasChecklists() {
     ]
 
     return(
+        <View className="flex-1">
+        <StatusBar
+            backgroundColor="#1976D2"
+            translucent={false} // 🔥 ISSO RESOLVE
+            />
         <ScrollView className="flex-1 bg-white p-4">
-            <Text className="text-2xl font-bold mb-6 mt-16">Minhas Checklists</Text>
+            <Text className="text-2xl font-bold mb-6 mt-4">Minhas Checklists</Text>
 
             <Pressable
                 onPress={() => router.navigate('/menu-categorias')}
@@ -41,8 +47,8 @@ export default function MinhasChecklists() {
                     </Pressable>
                 ))}
             </View>
-
         </ScrollView>
+        </View>
     );
 
 }
