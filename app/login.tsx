@@ -22,10 +22,13 @@ export default function Login() {
 
     const handleLogin = async (user: string, password: string) => {
         try {
+            console.log(process.env.EXPO_PUBLIC_BASE_URL);
+
             console.log("Realizando login Before");
-            const response = await api.post('login', { login: user, password: password });
+            const response = await api.post('v1/auth/login', { login: user, senha: password });
             console.log("Realiza login AFTER");
             if (response.status == 200) {
+                console.log("Login realizado com sucesso", response.data);
                 return response.data;
             }
         } catch ({ response }: any) {
@@ -119,11 +122,11 @@ export default function Login() {
             ToastAndroid.show("Conectando ao servidor, aguarde", ToastAndroid.LONG);
         }
         //TODO:
-        // const { access_token } = await handleLogin(login, password);
-        const access_token = "1234567890";
-        if (access_token) {
+        const { accessToken, refreshToken} = await handleLogin(login, password);
+        // const accessToken = "1234567890";
+        if (accessToken) {
             console.log("Atualizando banco de dados");
-            // await updateDatabase({ filial, centroDeCusto, localDeEstoque, localizacao, equipamento, categoria, produto, access_token, nomeUsuario, classificacao, funcoes });
+            // await updateDatabase({ filial, centroDeCusto, localDeEstoque, localizacao, equipamento, categoria, produto, accessToken, nomeUsuario, classificacao, funcoes });
             if (Platform.OS == 'android') {
                 ToastAndroid.show("Base local atualizada", ToastAndroid.SHORT);
             }
