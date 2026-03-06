@@ -1,20 +1,47 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar, ScrollView} from "react-native";
 import Input from "./components/Input";
 import Button from "./components/Button";
-import { api } from "../utils/axios";
 // import { router, useLocalSearchParams } from "expo-router";
 import { router } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import api from "../services/api";
+import { useLocalSearchParams } from "expo-router";
 
 export default function MenuModelos() {
+    //v1/model/obra/1
 
-    const modelos = [
-        { id: 1, title: 'Manutenção Pneu', categoria_id: 3},
-        { id: 2, title: 'Manutenção Motor', categoria_id: 3},
-        { id: 3, title: 'Manutenção Suspensão', categoria_id: 3},
-    ];
+    // const modelos = [
+    //     { id: 1, title: 'Manutenção Pneu', categoria_id: 3},
+    //     { id: 2, title: 'Manutenção Motor', categoria_id: 3},
+    //     { id: 3, title: 'Manutenção Suspensão', categoria_id: 3},
+    // ];
+    const [modelos, setModelos] = useState([]);
+    const idObra = "1";
+    //pegar modelos passados como parametro da tela anterior
+    const { modelosCategoria } = useLocalSearchParams();
+    const modelosIDs = JSON.parse(modelosCategoria as string);
+
+    useEffect(() => {
+        buscarModelos();
+    }, []);
+
+    const buscarModelos = async () => {
+        try {
+            const response = await api.get(`/v1/model/obra/${idObra}`);
+            if(response.status == 200){
+                console.log("Modelos: ", response.data);
+                //filtrar modelos de acordo com os ids passados como parametro em modelosIDs
+                const modelosFiltrados = response.data.filter((modelo: any) => modelosIDs.includes(modelo.id));
+                console.log("Modelos filtrados: ", modelosFiltrados);
+
+                setModelos(modelosFiltrados);
+            }
+        } catch (error) {
+            console.log("Erro ao buscar modelos: ", error);
+            Alert.alert("Erro ao buscar modelos", "Ocorreu um erro ao buscar os modelos. Por favor, tente novamente mais tarde.");
+        }
+    }
 
     return(
         <View className="flex-1">
@@ -28,13 +55,19 @@ export default function MenuModelos() {
                 <Text className="text-md font-bold mb-6 text-gray-400">Escolha um modelo</Text>
                 
                 <View className="gap-4">
-                    {modelos.map((modelo) => (
+                    {modelos.map((modelo: any) => (
                         <Pressable
                             key={modelo.id}
                             onPress={() => router.navigate('form-checklist')} //router.push(`/categoria/${category.id}`)
                             className="bg-blue-500 rounded-lg p-6 h-32 justify-center">
                             <Text className="text-white text-xl font-bold">
-                                {modelo.title}
+                                {modelo.nome}
+                            </Text>
+                            <Text className="text-blue-100 text-sm mt-2">
+                                {modelo.versao}
+                            </Text>
+                            <Text className="text-blue-100 text-sm mt-2">
+                                {modelo.objetivo}
                             </Text>
                         </Pressable>
                     ))}

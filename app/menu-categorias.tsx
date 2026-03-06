@@ -2,19 +2,34 @@ import { useState, useEffect } from "react";
 import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar, ScrollView} from "react-native";
 import Input from "./components/Input";
 import Button from "./components/Button";
-import { api } from "../utils/axios";
+// import { api } from "../utils/axios";
 // import { router, useLocalSearchParams } from "expo-router";
 import { router } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
+import api from "../services/api";
 
-
+// http://10.10.2.200:3005/api/v1/category/obra/1
 export default function MenuCategorias() {
 
-    const categories = [
-        { id: 1, title: 'Segurança do Trabalho', description: 'Descrição da categoria 1' },
-        { id: 2, title: 'Qualidade de Concreto', description: 'Descrição da categoria 2' },
-        { id: 3, title: 'Manutenção Preventiva', description: 'Descrição da categoria 3' },
-    ];
+    const [categorias, setCategorias] = useState([]);
+    const idObra = "1"; //TODO: pegar id da obra selecionada
+
+    useEffect(() => {
+        buscarCategorias();
+    }, []);
+
+    const buscarCategorias = async () => {
+        try {
+            const response = await api.get(`/v1/category/obra/${idObra}`);
+            console.log("Categorias: ", response.data);
+            setCategorias(response.data);
+
+        } catch (error) {
+            console.log("Erro ao buscar categorias: ", error);
+            Alert.alert("Erro ao buscar categorias", "Ocorreu um erro ao buscar as categorias. Por favor, tente novamente mais tarde.");
+        }
+    }
+
 
     return(
         <View className="flex-1">
@@ -28,17 +43,23 @@ export default function MenuCategorias() {
                 <Text className="text-md font-bold mb-6 text-gray-400">Escolha uma categoria</Text>
                 
                 <View className="gap-4">
-                    {categories.map((category) => (
+                    {categorias.map((categoria:any) => (
                         <Pressable
-                            key={category.id}
-                            onPress={() => router.navigate('/menu-modelos')}
+                            key={categoria.id}
+                            onPress={() => router.navigate({
+                                pathname:'/menu-modelos', 
+                                params: {
+                                    modelosCategoria: JSON.stringify(categoria.modelos)
+                                }
+                              })
+                            }
                             className="bg-blue-500 rounded-lg p-6 h-32 justify-center"
                         >
                             <Text className="text-white text-xl font-bold">
-                                {category.title}
+                                {categoria.nome}
                             </Text>
                             <Text className="text-blue-100 text-sm mt-2">
-                                {category.description}
+                                {categoria.descricao}
                             </Text>
                         </Pressable>
                     ))}

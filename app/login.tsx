@@ -5,6 +5,7 @@ import Button from "./components/Button";
 import { useNetInfo } from '@react-native-community/netinfo';
 import { api } from "../utils/axios";
 import { router, useLocalSearchParams } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function Login() {
@@ -123,6 +124,10 @@ export default function Login() {
         }
         //TODO:
         const { accessToken, refreshToken} = await handleLogin(login, password);
+        //Salvar tokens no AsyncStorage
+        await AsyncStorage.setItem("accessToken", accessToken);
+        await AsyncStorage.setItem("refreshToken", refreshToken);
+
         // const accessToken = "1234567890";
         if (accessToken) {
             console.log("Atualizando banco de dados");
