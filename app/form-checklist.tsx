@@ -4,12 +4,12 @@ import Input from "./components/Input";
 import Button from "./components/Button";
 import { api } from "../utils/axios";
 // import { router, useLocalSearchParams } from "expo-router";
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type Questao = {
     id: string;
-    titulo: string;
+    descricao: string;
     resposta?: 'C' | 'NC' | 'NA' | '';
     observacao?: string;
     fotos?: string[];
@@ -23,19 +23,33 @@ type Props = {
 export default function FormChecklist() {
 
     const [questoes, setQuestoes] = useState<Questao[]>([
-        { id: '1', titulo: 'O colaborador está usando EPI?', resposta: ''},
-        { id: '2', titulo: 'O extintor está dentro da validade?', resposta: ''},
-        { id: '3', titulo: 'A sinalização de segurança está visível?', resposta: ''},
-        { id: '4', titulo: 'O colaborador está usando EPI?', resposta: ''}, 
-        { id: '5', titulo: 'O extintor está dentro da validade?', resposta: ''},
-        { id: '6', titulo: 'A sinalização de segurança está visível?', resposta: ''},
+        // { id: '1', titulo: 'O colaborador está usando EPI?', resposta: ''},
+        // { id: '2', titulo: 'O extintor está dentro da validade?', resposta: ''},
+        // { id: '3', titulo: 'A sinalização de segurança está visível?', resposta: ''},
+        // { id: '4', titulo: 'O colaborador está usando EPI?', resposta: ''}, 
+        // { id: '5', titulo: 'O extintor está dentro da validade?', resposta: ''},
+        // { id: '6', titulo: 'A sinalização de segurança está visível?', resposta: ''},
     ]);
 
-    // const questoes = [
-    //     { id: 1, titulo: 'O colaborador está usando EPI?', resposta: ''},
-    //     { id: 2, titulo: 'O extintor está dentro da validade?', resposta: ''},
-    //     { id: 3, titulo: 'A sinalização de segurança está visível?', resposta: ''},
-    // ]
+    const { perguntasDoModelo } = useLocalSearchParams();
+    // const perguntas = JSON.parse(perguntasDoModelo as string);
+    // const perguntas = JSON.parse(perguntasDoModelo as string || '[]');
+
+    useEffect(() => {
+        const parsed = JSON.parse(perguntasDoModelo as string || '[]');
+
+        const inicial = parsed.map((p:any, index: number) => ({
+            id: index,
+            descricao: p.descricao,
+            resposta: '',
+            observacao: '',
+            fotos: [],
+            videos: []
+        }));
+
+        setQuestoes(inicial);
+    }, [perguntasDoModelo]);
+
 
     function atualizarQuestao(id: string, dados: Partial<Questao>) {
         setQuestoes((prev) =>
@@ -85,7 +99,7 @@ export default function FormChecklist() {
         <View className="flex-1">
             <StatusBar
             backgroundColor="#1976D2"
-            translucent={false} // 🔥 ISSO RESOLVE
+            translucent={false}
             />
             <SafeAreaView className="flex-1 bg-white">
             <ScrollView className="flex-1 bg-white p-4">
@@ -95,7 +109,7 @@ export default function FormChecklist() {
                 {/* Need a loading bar based number of questions asked to 100% */}
                 <View className="mb-4">
                     <Text className="text-right text-xs text-gray-500 mb-1">
-                        {Math.round((questoes.filter(q => q.resposta).length / questoes.length * 100))}%
+                        {/* {Math.round((questoes.filter(q => q.resposta).length / questoes.length * 100))}% */}
                     </Text>
                     <View className="w-full bg-gray-200 rounded-full h-2.5">
                         <View 
@@ -106,20 +120,19 @@ export default function FormChecklist() {
                 </View>
 
                 <View className="gap-4">
-                {questoes.map((questao) => (
+                {questoes.map((questao: any, index: any) => (
                     <View
-                    key={questao.id}
+                    key={index}
                     className="bg-white rounded-xl p-5 shadow-md border border-gray-200"
                     >
                     {/* TÍTULO */}
                     <Text className="text-lg font-bold text-gray-800 mb-4">
-                        {questao.titulo}
+                        {questao.descricao}
                     </Text>
 
                     {/* BOTÕES */}
                     <View className="flex-row justify-between gap-2 mb-3">
 
-                        {/* C */}
                         <Pressable
                         onPress={() => selecionarResposta(questao.id, 'C')}
                         className={`flex-1 py-3 rounded-lg items-center ${
@@ -131,7 +144,7 @@ export default function FormChecklist() {
                         <Text className="font-bold text-white">C</Text>
                         </Pressable>
 
-                        {/* NC */}
+
                         <Pressable
                         onPress={() => selecionarResposta(questao.id, 'NC')}
                         className={`flex-1 py-3 rounded-lg items-center ${
@@ -143,7 +156,6 @@ export default function FormChecklist() {
                         <Text className="font-bold text-white">NC</Text>
                         </Pressable>
 
-                        {/* NA */}
                         <Pressable
                         onPress={() => selecionarResposta(questao.id, 'NA')}
                         className={`flex-1 py-3 rounded-lg items-center ${
@@ -154,13 +166,12 @@ export default function FormChecklist() {
                         >
                         <Text className="font-bold text-white">NA</Text>
                         </Pressable>
-                    </View>
+                    </View> 
 
                     {/* SE FOR NÃO CONFORME */}
                     {questao.resposta === 'NC' && (
                         <View className="mt-2 gap-3">
 
-                        {/* Campo Observação */}
                         <TextInput
                             placeholder="Descreva o problema..."
                             multiline
@@ -171,7 +182,6 @@ export default function FormChecklist() {
                             className="border border-gray-300 rounded-lg p-3 min-h-[80px] text-gray-800"
                         />
 
-                        {/* Botões Foto e Vídeo */}
                         <View className="flex-row gap-3">
 
                             <Pressable

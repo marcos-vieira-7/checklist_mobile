@@ -85,7 +85,7 @@ export default function Login() {
     //     }
     // }
 
-    const handleConfirmPassword = async () => {
+    const handleConfirmPassword = async () => { 
         if (newPassword != confirmNewPassword) {
             Alert.alert("As senhas não conferem", "A nova confirmação de senha deve ser igual a nova senha");
             return;

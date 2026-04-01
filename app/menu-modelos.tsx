@@ -58,7 +58,14 @@ export default function MenuModelos() {
                     {modelos.map((modelo: any) => (
                         <Pressable
                             key={modelo.id}
-                            onPress={() => router.navigate('form-checklist')} //router.push(`/categoria/${category.id}`)
+                            // onPress={() => router.navigate('form-checklist')}
+                            onPress={() => router.navigate({
+                                pathname:'/form-checklist', 
+                                params: {
+                                    perguntasDoModelo: modelo.perguntas
+                                }
+                              })
+                            }          
                             className="bg-blue-500 rounded-lg p-6 h-32 justify-center">
                             <Text className="text-white text-xl font-bold">
                                 {modelo.nome}
