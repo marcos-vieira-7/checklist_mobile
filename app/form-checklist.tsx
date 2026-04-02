@@ -22,14 +22,7 @@ type Props = {
 
 export default function FormChecklist() {
 
-    const [questoes, setQuestoes] = useState<Questao[]>([
-        // { id: '1', titulo: 'O colaborador está usando EPI?', resposta: ''},
-        // { id: '2', titulo: 'O extintor está dentro da validade?', resposta: ''},
-        // { id: '3', titulo: 'A sinalização de segurança está visível?', resposta: ''},
-        // { id: '4', titulo: 'O colaborador está usando EPI?', resposta: ''}, 
-        // { id: '5', titulo: 'O extintor está dentro da validade?', resposta: ''},
-        // { id: '6', titulo: 'A sinalização de segurança está visível?', resposta: ''},
-    ]);
+    const [questoes, setQuestoes] = useState<Questao[]>([]);
 
     const { perguntasDoModelo } = useLocalSearchParams();
     // const perguntas = JSON.parse(perguntasDoModelo as string);
@@ -63,7 +56,7 @@ export default function FormChecklist() {
         atualizarQuestao(id, {
         resposta: valor,
         ...(valor !== 'NC' && {
-            observacao: undefined,
+            observacao: '',
             fotos: [],
             videos: [],
         }),
@@ -73,26 +66,28 @@ export default function FormChecklist() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     async function handleSubmit() {
-        setIsSubmitting(true);
-        try {
-            const payload = { questoes };
-            await api.post('/checklists', payload);
-            if (Platform.OS === 'android') {
-                ToastAndroid.show('Checklist enviada', ToastAndroid.SHORT);
-            } else {
-                Alert.alert('Sucesso', 'Checklist enviada');
-            }
-            router.navigate('/minhas-checklists');
-        } catch (error) {
-            console.error(error);
-            if (Platform.OS === 'android') {
-                ToastAndroid.show('Erro ao enviar checklist', ToastAndroid.SHORT);
-            } else {
-                Alert.alert('Erro', 'Erro ao enviar checklist');
-            }
-        } finally {
-            setIsSubmitting(false);
-        }
+
+        console.log('Checklist a ser enviada:', questoes);
+        // setIsSubmitting(true);
+        // try {
+        //     const payload = { questoes };
+        //     await api.post('/checklists', payload);
+        //     if (Platform.OS === 'android') {
+        //         ToastAndroid.show('Checklist enviada', ToastAndroid.SHORT);
+        //     } else {
+        //         Alert.alert('Sucesso', 'Checklist enviada');
+        //     }
+        //     router.navigate('/minhas-checklists');
+        // } catch (error) {
+        //     console.error(error);
+        //     if (Platform.OS === 'android') {
+        //         ToastAndroid.show('Erro ao enviar checklist', ToastAndroid.SHORT);
+        //     } else {
+        //         Alert.alert('Erro', 'Erro ao enviar checklist');
+        //     }
+        // } finally {
+        //     setIsSubmitting(false);
+        // }
     }
 
     return(
@@ -109,7 +104,7 @@ export default function FormChecklist() {
                 {/* Need a loading bar based number of questions asked to 100% */}
                 <View className="mb-4">
                     <Text className="text-right text-xs text-gray-500 mb-1">
-                        {/* {Math.round((questoes.filter(q => q.resposta).length / questoes.length * 100))}% */}
+                        {Math.round((questoes.filter(q => q.resposta).length / questoes.length * 100))}
                     </Text>
                     <View className="w-full bg-gray-200 rounded-full h-2.5">
                         <View 
@@ -211,7 +206,7 @@ export default function FormChecklist() {
                 </View>
 
                 <View className="mt-6 mb-10">
-                    <Button onPress={() => Alert.alert("Checklist Enviado com Sucesso!")} disabled={isSubmitting} class="bg-green-600">
+                    <Button onPress={() => handleSubmit()} disabled={isSubmitting} class="bg-green-600">
                         <Text className="text-white font-bold">{isSubmitting ? 'Enviando...' : 'Enviar'}</Text>
                     </Button>
                 </View>
