@@ -1,18 +1,23 @@
 import { useState, useEffect } from "react";
-import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar, ScrollView, TextInput} from "react-native";
+import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar, ScrollView, TextInput, TouchableOpacity} from "react-native";
 import Input from "./components/Input";
 import Button from "./components/Button";
 import { api } from "../utils/axios";
 // import { router, useLocalSearchParams } from "expo-router";
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as ImagePicker from 'expo-image-picker'; 
+
+type Foto = {
+  uri: string;
+};
 
 type Questao = {
     id: string;
     descricao: string;
     resposta?: 'C' | 'NC' | 'NA' | '';
     observacao?: string;
-    fotos?: string[];
+    fotos?: Foto[];
     videos?: string[];
 }
 
@@ -46,11 +51,21 @@ export default function FormChecklist() {
 
     function atualizarQuestao(id: string, dados: Partial<Questao>) {
         setQuestoes((prev) =>
-        prev.map((q) =>
-            q.id === id ? { ...q, ...dados } : q
-        )
+            prev.map((q) => {
+            if (q.id !== id) return q;
+
+            return {
+                ...q,
+                ...dados,
+                fotos: [
+                ...(q.fotos || []),
+                ...(dados.fotos || [])
+                ]
+            };
+            })
         );
     }
+
 
     function selecionarResposta(id: string, valor: 'C' | 'NC' | 'NA') {
         atualizarQuestao(id, {
@@ -89,6 +104,21 @@ export default function FormChecklist() {
         //     setIsSubmitting(false);
         // }
     }
+
+    const tirarFoto = async (id: string) => {
+        const res = await ImagePicker.launchCameraAsync();
+
+        if (!res.canceled) {
+            atualizarQuestao(id, {
+            fotos: [
+                {
+                uri: res.assets[0].uri
+                }
+            ]
+            });
+        }
+    };
+
 
     return(
         <View className="flex-1">
@@ -179,14 +209,26 @@ export default function FormChecklist() {
 
                         <View className="flex-row gap-3">
 
-                            <Pressable
+                            {/* <Pressable
                             onPress={() => console.log('Adicionar Foto')}
                             className="flex-1 bg-blue-600 py-3 rounded-lg items-center"
                             >
                             <Text className="text-white font-semibold">
                                 📷 Add Foto
+                                <TextInput
+                                    placeholder="URL da Foto"
+                                    value={questao.foto}
+                                    onChangeText={(text) =>
+                                        atualizarQuestao(questao.id, { foto: text })
+                                    }
+                                    className="border border-gray-300 rounded-lg p-3 text-gray-800"
+                                />
+
                             </Text>
-                            </Pressable>
+                            </Pressable> */}
+                            <TouchableOpacity onPress={() => tirarFoto(questao.id)}>
+                            <Text>📸 Foto</Text>
+                            </TouchableOpacity>
 
                             <Pressable
                             onPress={() => console.log('Adicionar Vídeo')}

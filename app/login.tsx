@@ -34,11 +34,12 @@ export default function Login() {
             }
         } catch ({ response }: any) {
             if (response.status == 401) {
-                Alert.alert("Senha Incorreta", response.data.message);
+                Alert.alert("Usuário ou Senha Incorreta", response.data.message);
+                setLoading(false);
                 return false;
             }
             Alert.alert("Erro desconhecido", JSON.stringify(response.data.message));
-            console.log("Erro: " + response.data);
+            console.log("Erro: " + JSON.stringify(response.data));
             return false;
         }
     }
@@ -136,10 +137,11 @@ export default function Login() {
                 ToastAndroid.show("Base local atualizada", ToastAndroid.SHORT);
             }
             console.log("Navegando para menu categorias");
+            setLoading(false);
             try {
                 router.navigate('/minhas-checklists');
             } catch (error) {
-                console.log("Erro ao navegar para menu categorias: " + error);
+                console.log("Erro ao navegar para menu categorias: " + JSON.stringify(error));
             }
             
         } else {
