@@ -62,7 +62,9 @@ export default function MenuModelos() {
                             onPress={() => router.navigate({
                                 pathname:'/form-checklist', 
                                 params: {
-                                    perguntasDoModelo: modelo.perguntas
+                                    perguntasDoModelo: modelo.perguntas,
+                                    nomeModelo: modelo.nome,
+                                    idObra: idObra,
                                 }
                               })
                             }          

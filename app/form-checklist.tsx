@@ -29,11 +29,16 @@ export default function FormChecklist() {
 
     const [questoes, setQuestoes] = useState<Questao[]>([]);
 
-    const { perguntasDoModelo } = useLocalSearchParams();
+    const { perguntasDoModelo, nomeModelo, idObra } = useLocalSearchParams();
     // const perguntas = JSON.parse(perguntasDoModelo as string);
     // const perguntas = JSON.parse(perguntasDoModelo as string || '[]');
+    const [localizacao, setLocalizacao] = useState('');
 
     useEffect(() => {
+
+        console.log("modelo recebido: ", nomeModelo);
+        console.log("Perguntas id obra: ", idObra);
+
         const parsed = JSON.parse(perguntasDoModelo as string || '[]');
 
         const inicial = parsed.map((p:any, index: number) => ({
@@ -106,8 +111,13 @@ export default function FormChecklist() {
     }
 
     const tirarFoto = async (id: string) => {
-        const res = await ImagePicker.launchCameraAsync();
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+            alert('Permissão da câmera é necessária');
+            return;
+        }
 
+        const res = await ImagePicker.launchCameraAsync();
         if (!res.canceled) {
             atualizarQuestao(id, {
             fotos: [
@@ -128,7 +138,7 @@ export default function FormChecklist() {
             />
             <SafeAreaView className="flex-1 bg-white">
             <ScrollView className="flex-1 bg-white p-4">
-                <Text className="text-2xl font-bold mb-6 mt-2">CheckList</Text>
+                <Text className="text-2xl font-bold mb-6 mt-2">{nomeModelo}</Text>
                 <Text className="text-md font-bold mb-6 text-gray-400">Preencha as informações</Text>
                 
                 {/* Need a loading bar based number of questions asked to 100% */}
@@ -145,6 +155,17 @@ export default function FormChecklist() {
                 </View>
 
                 <View className="gap-4">
+
+                    <View className="mb-4">
+                        <Text className="text-lg font-bold text-gray-800 mb-2">Localização</Text>
+                        <TextInput
+                            placeholder="Digite a localização..."
+                            value={localizacao}
+                            onChangeText={setLocalizacao}
+                            className="border border-gray-300 rounded-lg p-3 text-gray-800"
+                        />
+                    </View>
+
                 {questoes.map((questao: any, index: any) => (
                     <View
                     key={index}
