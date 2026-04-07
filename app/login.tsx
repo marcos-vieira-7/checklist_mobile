@@ -128,6 +128,7 @@ export default function Login() {
         //Salvar tokens no AsyncStorage
         await AsyncStorage.setItem("accessToken", accessToken);
         await AsyncStorage.setItem("refreshToken", refreshToken);
+        await AsyncStorage.setItem("nomeUsuario", login);
 
         // const accessToken = "1234567890";
         if (accessToken) {

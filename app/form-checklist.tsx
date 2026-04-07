@@ -7,12 +7,13 @@ import { api } from "../utils/axios";
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from 'expo-image-picker'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Foto = {
   uri: string;
 };
 
-type Questao = {
+type Questao = { 
     id: string;
     descricao: string;
     resposta?: 'C' | 'NC' | 'NA' | '';
@@ -25,23 +26,44 @@ type Props = {
     questoesIniciais: Questao[];
 }
 
+type Checklist = {
+    uuid: string;
+    modelo: string;
+    id_obra: string;
+    usuario_criador: string;
+    localizacao: string;
+    data_hora_criacao: string;
+    respostas: Questao[];
+    status: number;
+}
+
+let nomeUsuario:any = '';
+
 export default function FormChecklist() {
 
     const [questoes, setQuestoes] = useState<Questao[]>([]);
 
     const { perguntasDoModelo, nomeModelo, idObra } = useLocalSearchParams();
-    // const perguntas = JSON.parse(perguntasDoModelo as string);
-    // const perguntas = JSON.parse(perguntasDoModelo as string || '[]');
     const [localizacao, setLocalizacao] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        //below get a asyncstorage var called nomeUsuario and print it in the console
+        const getNomeUsuario = async () => { 
+            nomeUsuario = await AsyncStorage.getItem("nomeUsuario"); 
+            console.log("Nome do usuário logado: ", nomeUsuario);
+        }
+        getNomeUsuario();
+    }, []);
 
     useEffect(() => {
 
         console.log("modelo recebido: ", nomeModelo);
         console.log("Perguntas id obra: ", idObra);
 
-        const parsed = JSON.parse(perguntasDoModelo as string || '[]');
+        const parsedPerguntas = JSON.parse(perguntasDoModelo as string || '[]');
 
-        const inicial = parsed.map((p:any, index: number) => ({
+        const inicial = parsedPerguntas.map((p:any, index: number) => ({
             id: index,
             descricao: p.descricao,
             resposta: '',
@@ -83,11 +105,91 @@ export default function FormChecklist() {
         });
     }
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const tirarFoto = async (id: string) => {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+            alert('Permissão da câmera é necessária');
+            return;
+        }
+
+        const res = await ImagePicker.launchCameraAsync();
+        if (!res.canceled) {
+            atualizarQuestao(id, {
+            fotos: [
+                {
+                uri: res.assets[0].uri
+                }
+            ]
+            });
+        }
+    };
+
+    //1: Aberta, 2: Em andamento, 3: Resolvida, 4: Fechada
+    const montarPayload = () => {
+        return {
+            uuid: '123', // pode vir de lib depois
+            modelo: nomeModelo,
+            id_obra: idObra,
+            usuario_criador: nomeUsuario,
+            localizacao: localizacao,
+            data_hora_criacao: new Date().toISOString(),
+            respostas: questoes.map((q) => ({
+                id: q.id,
+                descricao: q.descricao,
+                resposta: q.resposta,
+                observacao: q.observacao
+                // 👇 NÃO coloca fotos aqui
+            })),
+            status: 1
+        };
+    };
+
+    const formularioValidoNC = () => {
+        //valida se questoes com resposta 'NC' tem observação preenchida
+        return questoes.every((q) => {
+            if (q.resposta === 'NC') {
+            return q.observacao && q.observacao.trim() !== '';
+            }
+            return true;
+        });
+    };
 
     async function handleSubmit() {
-
         console.log('Checklist a ser enviada:', questoes);
+        
+        //se form não é valido
+        if (!formularioValidoNC()) {
+            alert('Preencha a observação para itens não conformes');
+            return;
+        }
+
+        const formData = new FormData();
+        const payload = montarPayload();
+
+        // 1. manda o JSON inteiro
+        formData.append('data', JSON.stringify(payload));
+
+        // 2. manda as fotos separadas
+        questoes.forEach((q) => {
+            q.fotos?.forEach((foto, i) => {
+            formData.append(`fotos_${q.id}`, {
+                uri: foto.uri,
+                name: `foto_${i}.jpg`,
+                type: 'image/jpeg'
+            } as any);
+            });
+        });
+
+        console.log('FormData preparado para envio:', formData);
+        // 3. envia
+        // const res = await fetch('https://sua-api.com/checklist', {
+        //     method: 'POST',
+        //     body: formData
+        // });
+
+        // const data = await res.json();
+        // console.log(data);
+
         // setIsSubmitting(true);
         // try {
         //     const payload = { questoes };
@@ -109,26 +211,6 @@ export default function FormChecklist() {
         //     setIsSubmitting(false);
         // }
     }
-
-    const tirarFoto = async (id: string) => {
-        const { status } = await ImagePicker.requestCameraPermissionsAsync();
-        if (status !== 'granted') {
-            alert('Permissão da câmera é necessária');
-            return;
-        }
-
-        const res = await ImagePicker.launchCameraAsync();
-        if (!res.canceled) {
-            atualizarQuestao(id, {
-            fotos: [
-                {
-                uri: res.assets[0].uri
-                }
-            ]
-            });
-        }
-    };
-
 
     return(
         <View className="flex-1">
@@ -247,7 +329,7 @@ export default function FormChecklist() {
 
                             </Text>
                             </Pressable> */}
-                            <TouchableOpacity onPress={() => tirarFoto(questao.id)}>
+                            <TouchableOpacity className="flex-1 bg-blue-600 py-3 rounded-lg items-center"  onPress={() => tirarFoto(questao.id)}>
                             <Text>📸 Foto</Text>
                             </TouchableOpacity>
 
