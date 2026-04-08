@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar, ScrollView, TextInput, TouchableOpacity} from "react-native";
 import Input from "./components/Input";
 import Button from "./components/Button";
-import { api } from "../utils/axios";
+import api from "../services/api";
 // import { router, useLocalSearchParams } from "expo-router";
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,7 +19,7 @@ type Questao = {
     resposta?: 'C' | 'NC' | 'NA' | '';
     observacao?: string;
     fotos?: Foto[];
-    videos?: string[];
+    videos?: Foto[];
 }
 
 type Props = {
@@ -40,7 +40,7 @@ type Checklist = {
 let nomeUsuario:any = '';
 
 export default function FormChecklist() {
-
+    
     const [questoes, setQuestoes] = useState<Questao[]>([]);
 
     const { perguntasDoModelo, nomeModelo, idObra } = useLocalSearchParams();
@@ -105,23 +105,71 @@ export default function FormChecklist() {
         });
     }
 
-    const tirarFoto = async (id: string) => {
-        const { status } = await ImagePicker.requestCameraPermissionsAsync();
-        if (status !== 'granted') {
-            alert('Permissão da câmera é necessária');
-            return;
-        }
+    // const tirarFoto = async (id: string) => {
+    //     const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    //     if (status !== 'granted') {
+    //         alert('Permissão da câmera é necessária');
+    //         return;
+    //     }
 
-        const res = await ImagePicker.launchCameraAsync();
-        if (!res.canceled) {
-            atualizarQuestao(id, {
-            fotos: [
-                {
-                uri: res.assets[0].uri
+    //     const res = await ImagePicker.launchCameraAsync({
+    //         mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    //         allowsMultipleSelection: true,
+    //         quality: 0.7,
+    //     });
+
+    //     if (!res.canceled) {
+    //         atualizarQuestao(id, {
+    //         fotos: res.assets.map(a => ({ uri: a.uri }))
+    //         });
+    //     }
+
+    // };
+
+    const selecionarImagem = async (id: string) => {
+        Alert.alert('Selecionar imagem', '', [
+            {
+            text: 'Câmera',
+            onPress: async () => {
+                const { status } = await ImagePicker.requestCameraPermissionsAsync();
+                if (status !== 'granted') return;
+
+                const res = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                quality: 0.7,
+                });
+
+                if (!res.canceled) {
+                atualizarQuestao(id, {
+                    fotos: res.assets.map(a => ({ uri: a.uri }))
+                });
                 }
-            ]
-            });
-        }
+            }
+            },
+            {
+            text: 'Galeria',
+            onPress: async () => {
+                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                if (status !== 'granted') return;
+
+                const res = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsMultipleSelection: true,
+                quality: 0.7,
+                });
+
+                if (!res.canceled) {
+                atualizarQuestao(id, {
+                    fotos: res.assets.map(a => ({ uri: a.uri }))
+                });
+                }
+            }
+            },
+            {
+            text: 'Cancelar',
+            style: 'cancel'
+            }
+        ]);
     };
 
     //1: Aberta, 2: Em andamento, 3: Resolvida, 4: Fechada
@@ -164,11 +212,17 @@ export default function FormChecklist() {
         }
 
         const formData = new FormData();
-        const payload = montarPayload();
+        // const payload = montarPayload();
 
         // 1. manda o JSON inteiro
-        formData.append('data', JSON.stringify(payload));
-
+        // formData.append('data', JSON.stringify(payload));
+        formData.append('modelo', nomeModelo as string);
+        formData.append('id_obra', idObra as string);
+        formData.append('usuario_criador', nomeUsuario as string);
+        formData.append('localizacao', localizacao as string);
+        formData.append('data_hora_criacao', new Date().toISOString());
+        formData.append('status', '1');
+        
         // 2. manda as fotos separadas
         questoes.forEach((q) => {
             q.fotos?.forEach((foto, i) => {
@@ -180,36 +234,36 @@ export default function FormChecklist() {
             });
         });
 
+        formData.append('respostas', JSON.stringify(questoes.map((q) => ({
+                id: q.id,
+                descricao: q.descricao,
+                resposta: q.resposta,
+                observacao: q.observacao,
+                fotos: q.fotos?.map((f) => f.uri.split('/').pop() || '') || [] //guarda apenas nome arquivo.
+            })))
+        );
+            
         console.log('FormData preparado para envio:', formData);
-        // 3. envia
-        // const res = await fetch('https://sua-api.com/checklist', {
-        //     method: 'POST',
-        //     body: formData
-        // });
 
-        // const data = await res.json();
-        // console.log(data);
-
-        // setIsSubmitting(true);
-        // try {
-        //     const payload = { questoes };
-        //     await api.post('/checklists', payload);
-        //     if (Platform.OS === 'android') {
-        //         ToastAndroid.show('Checklist enviada', ToastAndroid.SHORT);
-        //     } else {
-        //         Alert.alert('Sucesso', 'Checklist enviada');
-        //     }
-        //     router.navigate('/minhas-checklists');
-        // } catch (error) {
-        //     console.error(error);
-        //     if (Platform.OS === 'android') {
-        //         ToastAndroid.show('Erro ao enviar checklist', ToastAndroid.SHORT);
-        //     } else {
-        //         Alert.alert('Erro', 'Erro ao enviar checklist');
-        //     }
-        // } finally {
-        //     setIsSubmitting(false);
-        // }
+        setIsSubmitting(true);
+        try {
+            await api.post('/v1/checklist', formData);
+            if (Platform.OS === 'android') {
+                ToastAndroid.show('Checklist enviada', ToastAndroid.SHORT);
+            } else {
+                Alert.alert('Sucesso', 'Checklist enviada');
+            }
+            router.navigate('/minhas-checklists');
+        } catch (error) {
+            console.error(error);
+            if (Platform.OS === 'android') {
+                ToastAndroid.show('Erro ao enviar checklist', ToastAndroid.SHORT);
+            } else {
+                Alert.alert('Erro', 'Erro ao enviar checklist');
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     return(
@@ -329,7 +383,7 @@ export default function FormChecklist() {
 
                             </Text>
                             </Pressable> */}
-                            <TouchableOpacity className="flex-1 bg-blue-600 py-3 rounded-lg items-center"  onPress={() => tirarFoto(questao.id)}>
+                            <TouchableOpacity className="flex-1 bg-blue-600 py-3 rounded-lg items-center"  onPress={() => selecionarImagem(questao.id)}>
                             <Text>📸 Foto</Text>
                             </TouchableOpacity>
 
