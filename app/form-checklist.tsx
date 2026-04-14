@@ -13,7 +13,7 @@ type Foto = {
   uri: string;
 };
 
-type Questao = { 
+type Questao = {
     id: string;
     descricao: string;
     resposta?: 'C' | 'NC' | 'NA' | '';
