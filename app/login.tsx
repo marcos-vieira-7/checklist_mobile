@@ -188,7 +188,7 @@ export default function Login() {
                     <Input value={login} onChangeText={setLogin} placeholder='Login' class="mt-6 mb-6" />
                     <Input value={password} onChangeText={setPassword} placeholder='Senha' secureTextEntry class="mb-6" />
 
-                    <Button disabled={loading} onPress={realizarLogin}><Text className="color-white font-bold">{loading ? "Conectando..." : "Acessar"}</Text></Button>
+                    <Button disabled={loading} onPress={realizarLogin}><Text className="color-white font-bold">{loading ? "Conectando..." : "Acessarx"}</Text></Button>
 
                     <Pressable onPress={handleForgotPassword}>
                         <Text className="mt-20 color-blue-500">Esqueceu a senha?</Text>

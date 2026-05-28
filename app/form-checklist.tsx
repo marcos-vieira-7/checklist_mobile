@@ -8,6 +8,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from 'expo-image-picker'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Crypto from 'expo-crypto';
 
 type Foto = {
   uri: string;
@@ -35,6 +36,14 @@ type Checklist = {
     data_hora_criacao: string;
     respostas: Questao[];
     status: number;
+}
+
+async function generateUUID(): Promise<string> {
+    const bytes = await Crypto.getRandomBytesAsync(16);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40; // version 4
+    bytes[8] = (bytes[8] & 0x3f) | 0x80; // variant 10
+    const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
 }
 
 let nomeUsuario:any = '';
@@ -216,6 +225,8 @@ export default function FormChecklist() {
 
         // 1. manda o JSON inteiro
         // formData.append('data', JSON.stringify(payload));
+        const uuid = await generateUUID();
+        formData.append('uuid', uuid);
         formData.append('modelo', nomeModelo as string);
         formData.append('id_obra', idObra as string);
         formData.append('usuario_criador', nomeUsuario as string);
@@ -247,15 +258,20 @@ export default function FormChecklist() {
 
         setIsSubmitting(true);
         try {
-            await api.post('/v1/checklist', formData);
+            //http://10.10.2.200:3005/api/v1/checklist/
+            await api.post('v1/checklist/', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
             if (Platform.OS === 'android') {
                 ToastAndroid.show('Checklist enviada', ToastAndroid.SHORT);
             } else {
                 Alert.alert('Sucesso', 'Checklist enviada');
             }
             router.navigate('/minhas-checklists');
-        } catch (error) {
-            console.error(error);
+        } catch (error: any) {
+            console.error(error.response || error);
             if (Platform.OS === 'android') {
                 ToastAndroid.show('Erro ao enviar checklist', ToastAndroid.SHORT);
             } else {
