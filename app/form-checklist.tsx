@@ -96,6 +96,10 @@ export default function FormChecklist() {
                 fotos: [
                 ...(q.fotos || []),
                 ...(dados.fotos || [])
+                ],
+                videos: [
+                ...(q.videos || []),
+                ...(dados.videos || [])
                 ]
             };
             })
@@ -181,6 +185,52 @@ export default function FormChecklist() {
         ]);
     };
 
+    const selecionarVideo = async (id: string) => {
+        Alert.alert('Selecionar vídeo', '', [
+            {
+            text: 'Câmera',
+            onPress: async () => {
+                const { status } = await ImagePicker.requestCameraPermissionsAsync();
+                if (status !== 'granted') return;
+
+                const res = await ImagePicker.launchCameraAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+                quality: 0.7,
+                });
+
+                if (!res.canceled) {
+                atualizarQuestao(id, {
+                    videos: res.assets.map(a => ({ uri: a.uri }))
+                });
+                }
+            }
+            },
+            {
+            text: 'Galeria',
+            onPress: async () => {
+                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                if (status !== 'granted') return;
+
+                const res = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+                allowsMultipleSelection: true,
+                quality: 0.7,
+                });
+
+                if (!res.canceled) {
+                atualizarQuestao(id, {
+                    videos: res.assets.map(a => ({ uri: a.uri }))
+                });
+                }
+            }
+            },
+            {
+            text: 'Cancelar',
+            style: 'cancel'
+            }
+        ]);
+    };
+
     //1: Aberta, 2: Em andamento, 3: Resolvida, 4: Fechada
     const montarPayload = () => {
         return {
@@ -234,13 +284,20 @@ export default function FormChecklist() {
         formData.append('data_hora_criacao', new Date().toISOString());
         formData.append('status', '1');
         
-        // 2. manda as fotos separadas
+        // 2. manda as fotos e vídeos separadas
         questoes.forEach((q) => {
             q.fotos?.forEach((foto, i) => {
             formData.append(`fotos_${q.id}`, {
                 uri: foto.uri,
                 name: `foto_${i}.jpg`,
                 type: 'image/jpeg'
+            } as any);
+            });
+            q.videos?.forEach((video, i) => {
+            formData.append(`videos_${q.id}`, {
+                uri: video.uri,
+                name: `video_${i}.mp4`,
+                type: 'video/mp4'
             } as any);
             });
         });
@@ -250,7 +307,8 @@ export default function FormChecklist() {
                 descricao: q.descricao,
                 resposta: q.resposta,
                 observacao: q.observacao,
-                fotos: q.fotos?.map((f) => f.uri.split('/').pop() || '') || [] //guarda apenas nome arquivo.
+                fotos: q.fotos?.map((f) => f.uri.split('/').pop() || '') || [],
+                videos: q.videos?.map((v) => v.uri.split('/').pop() || '') || []
             })))
         );
             
@@ -403,14 +461,14 @@ export default function FormChecklist() {
                             <Text>📸 Foto</Text>
                             </TouchableOpacity>
 
-                            <Pressable
-                            onPress={() => console.log('Adicionar Vídeo')}
+                            <TouchableOpacity
+                            onPress={() => selecionarVideo(questao.id)}
                             className="flex-1 bg-purple-600 py-3 rounded-lg items-center"
                             >
                             <Text className="text-white font-semibold">
                                 🎥 Add Vídeo
                             </Text>
-                            </Pressable>
+                            </TouchableOpacity>
 
                         </View>
 
