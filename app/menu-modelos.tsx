@@ -64,6 +64,8 @@ export default function MenuModelos() {
                                 params: {
                                     perguntasDoModelo: modelo.perguntas,
                                     nomeModelo: modelo.nome,
+                                    objetivoModelo: modelo.objetivo,
+                                    exigeEquipamento: modelo.exige_equipamento,
                                     idObra: idObra,
                                 }
                               })

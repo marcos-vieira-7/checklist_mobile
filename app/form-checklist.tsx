@@ -49,10 +49,10 @@ async function generateUUID(): Promise<string> {
 let nomeUsuario:any = '';
 
 export default function FormChecklist() {
-    
+     
     const [questoes, setQuestoes] = useState<Questao[]>([]);
 
-    const { perguntasDoModelo, nomeModelo, idObra } = useLocalSearchParams();
+    const { perguntasDoModelo, nomeModelo, objetivoModelo, exigeEquipamento, idObra } = useLocalSearchParams();
     const [localizacao, setLocalizacao] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -68,6 +68,8 @@ export default function FormChecklist() {
     useEffect(() => {
 
         console.log("modelo recebido: ", nomeModelo);
+        console.log("Objetivo do modelo: ", objetivoModelo);
+        console.log("Exige equipamento: ", exigeEquipamento);
         console.log("Perguntas id obra: ", idObra);
 
         const parsedPerguntas = JSON.parse(perguntasDoModelo as string || '[]');
@@ -232,31 +234,32 @@ export default function FormChecklist() {
     };
 
     //1: Aberta, 2: Em andamento, 3: Resolvida, 4: Fechada
-    const montarPayload = () => {
-        return {
-            uuid: '123', // pode vir de lib depois
-            modelo: nomeModelo,
-            id_obra: idObra,
-            usuario_criador: nomeUsuario,
-            localizacao: localizacao,
-            data_hora_criacao: new Date().toISOString(),
-            respostas: questoes.map((q) => ({
-                id: q.id,
-                descricao: q.descricao,
-                resposta: q.resposta,
-                observacao: q.observacao
-                // 👇 NÃO coloca fotos aqui
-            })),
-            status: 1
-        };
-    };
+    // const montarPayload = () => {
+    //     return {
+    //         uuid: '123', // pode vir de lib depois
+    //         modelo: nomeModelo,
+    //         id_obra: idObra,
+    //         usuario_criador: nomeUsuario,
+    //         localizacao: localizacao,
+    //         data_hora_criacao: new Date().toISOString(),
+    //         respostas: questoes.map((q) => ({
+    //             id: q.id,
+    //             descricao: q.descricao,
+    //             resposta: q.resposta,
+    //             observacao: q.observacao
+    //             // 👇 NÃO coloca fotos aqui
+    //         })),
+    //         status: 1
+    //     };¥
+    // };
 
     const formularioValidoNC = () => {
-        //valida se questoes com resposta 'NC' tem observação preenchida
+        //valida se questoes com resposta 'NC' tem observação preenchida, 
         return questoes.every((q) => {
             if (q.resposta === 'NC') {
-            return q.observacao && q.observacao.trim() !== '';
+                return q.observacao && q.observacao.trim() !== '';
             }
+            //TODO: fazer validacao exigeEquipamento.
             return true;
         });
     };
@@ -349,6 +352,7 @@ export default function FormChecklist() {
             <SafeAreaView className="flex-1 bg-white">
             <ScrollView className="flex-1 bg-white p-4">
                 <Text className="text-2xl font-bold mb-6 mt-2">{nomeModelo}</Text>
+                {/* <Text className="text-md font-bold mb-6 text-gray-400">{objetivoModelo}</Text> */}
                 <Text className="text-md font-bold mb-6 text-gray-400">Preencha as informações</Text>
                 
                 {/* Need a loading bar based number of questions asked to 100% */}
