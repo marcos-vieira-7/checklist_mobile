@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar} from "react-native";
+import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar } from "react-native";
 import Input from "./components/Input";
-import Button from "./components/Button"; 
+import Button from "./components/Button";
 import { useNetInfo } from '@react-native-community/netinfo';
 import { api } from "../utils/axios";
 import { router, useLocalSearchParams } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 
 
 export default function Login() {
-
     const { isConnected } = useNetInfo();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
@@ -26,7 +26,7 @@ export default function Login() {
             console.log(process.env.EXPO_PUBLIC_BASE_URL);
 
             console.log("Realizando login Before");
-            const response = await api.post('v1/auth/login', { login: user, senha: password });
+            const response = await api.post('auth/login', { login: user, senha: password });
             console.log("Realiza login AFTER");
             if (response.status == 200) {
                 console.log("Login realizado com sucesso", response.data);
@@ -86,7 +86,7 @@ export default function Login() {
     //     }
     // }
 
-    const handleConfirmPassword = async () => { 
+    const handleConfirmPassword = async () => {
         if (newPassword != confirmNewPassword) {
             Alert.alert("As senhas não conferem", "A nova confirmação de senha deve ser igual a nova senha");
             return;
@@ -124,7 +124,7 @@ export default function Login() {
             ToastAndroid.show("Conectando ao servidor, aguarde", ToastAndroid.LONG);
         }
         //TODO:
-        const { accessToken, refreshToken} = await handleLogin(login, password);
+        const { accessToken, refreshToken } = await handleLogin(login, password);
         //Salvar tokens no AsyncStorage
         await AsyncStorage.setItem("accessToken", accessToken);
         await AsyncStorage.setItem("refreshToken", refreshToken);
@@ -140,11 +140,11 @@ export default function Login() {
             console.log("Navegando para menu categorias");
             setLoading(false);
             try {
-                router.navigate('/minhas-checklists');
+                router.navigate('/menu-categorias');
             } catch (error) {
                 console.log("Erro ao navegar para menu categorias: " + JSON.stringify(error));
             }
-            
+
         } else {
             setLoading(false);
             return;
@@ -166,36 +166,36 @@ export default function Login() {
                 resizeMode="contain" // Ajusta a imagem para caber dentro do container sem cortar
             />
 
-        {codeSent ?
-            <View>
-                <Text>Informe o código recebido em seu e-mail e a nova senha:</Text>
-                <Input value={codeRecover} onChangeText={setCodeRecover} placeholder='Código' class="mt-6 mb-6" />
-                <Input value={newPassword} onChangeText={setNewPassword} secureTextEntry placeholder='Nova senha' class="mt-6 mb-6" />
-                <Input value={confirmNewPassword} onChangeText={setConfirmNewPassword} secureTextEntry placeholder='Confirmação da nova senha' class="mt-6 mb-6" />
-
-                <Button onPress={handleConfirmPassword}><Text className="color-slate-50 font-bold">Alterar Senha</Text></Button>
-            </View>
-            : forgotPassword ?
+            {codeSent ?
                 <View>
-                    <Text>Digite seu usuário para recuperação de senha:</Text>
-                    <Input value={emailRecuperacao} onChangeText={setEmailRecuperacao} placeholder='Usuário' class="mt-6 mb-6" />
+                    <Text>Informe o código recebido em seu e-mail e a nova senha:</Text>
+                    <Input value={codeRecover} onChangeText={setCodeRecover} placeholder='Código' class="mt-6 mb-6" />
+                    <Input value={newPassword} onChangeText={setNewPassword} secureTextEntry placeholder='Nova senha' class="mt-6 mb-6" />
+                    <Input value={confirmNewPassword} onChangeText={setConfirmNewPassword} secureTextEntry placeholder='Confirmação da nova senha' class="mt-6 mb-6" />
 
-                    <Button onPress={realizarRecuperacaoSenha}><Text className="color-slate-50 font-bold">Enviar código</Text></Button>
-                    <Button onPress={cancelaForgotPassword} class="mt-6 bg-red-600"><Text className="color-slate-50 font-bold">Cancelar</Text></Button>
+                    <Button onPress={handleConfirmPassword}><Text className="color-slate-50 font-bold">Alterar Senha</Text></Button>
                 </View>
-                :
-                <View className='flex flex-col items-center'>
-                    <Input value={login} onChangeText={setLogin} placeholder='Login' class="mt-6 mb-6" />
-                    <Input value={password} onChangeText={setPassword} placeholder='Senha' secureTextEntry class="mb-6" />
+                : forgotPassword ?
+                    <View>
+                        <Text>Digite seu usuário para recuperação de senha:</Text>
+                        <Input value={emailRecuperacao} onChangeText={setEmailRecuperacao} placeholder='Usuário' class="mt-6 mb-6" />
 
-                    <Button disabled={loading} onPress={realizarLogin}><Text className="color-white font-bold">{loading ? "Conectando..." : "Acessar"}</Text></Button>
+                        <Button onPress={realizarRecuperacaoSenha}><Text className="color-slate-50 font-bold">Enviar código</Text></Button>
+                        <Button onPress={cancelaForgotPassword} class="mt-6 bg-red-600"><Text className="color-slate-50 font-bold">Cancelar</Text></Button>
+                    </View>
+                    :
+                    <View className='flex flex-col items-center'>
+                        <Input value={login} onChangeText={setLogin} placeholder='nome.sobrenome' class="mt-6 mb-6" />
+                        <Input value={password} onChangeText={setPassword} placeholder='Sua senha' secureTextEntry class="mb-6" />
 
-                    <Pressable onPress={handleForgotPassword}>
-                        <Text className="mt-20 color-blue-500">Esqueceu a senha?</Text>
-                    </Pressable>
-                </View>
-        }
-        <Text className="absolute bottom-2">Versão: 0.00</Text>
+                        <Button disabled={loading} onPress={realizarLogin}><Text className="color-white font-bold">{loading ? "Conectando..." : "Acessar"}</Text></Button>
+
+                        <Pressable onPress={handleForgotPassword}>
+                            <Text className="mt-20 color-blue-500">Esqueceu a senha?</Text>
+                        </Pressable>
+                    </View>
+            }
+            <Text className="absolute bottom-2">Versão: {Constants?.expoConfig?.version}</Text>
         </View>
     );
 }

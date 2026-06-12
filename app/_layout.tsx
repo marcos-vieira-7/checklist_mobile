@@ -25,7 +25,7 @@ export default function RootLayout() {
 
       >
         <Stack.Screen name="login" options={{ headerShown: false}} /> 
-        <Stack.Screen name="menu-categorias" options={{ title: 'Categorias' }}/>
+        <Stack.Screen name="menu-categorias" options={{ title: 'Categorias', headerBackVisible: false }}/>
         <Stack.Screen name="minhas-checklists" options={{ title: 'Minhas Checklists' }}/>
         <Stack.Screen name="menu-modelos" options={{ title: 'Modelos' }}/>
         <Stack.Screen name="form-checklist" options={{ title: 'Formulário de Checklist' }}/>

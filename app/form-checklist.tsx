@@ -1,26 +1,26 @@
 import { useState, useEffect } from "react";
-import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar, ScrollView, TextInput, TouchableOpacity} from "react-native";
+import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar, ScrollView, TextInput, TouchableOpacity } from "react-native";
 import Input from "./components/Input";
 import Button from "./components/Button";
 import api from "../services/api";
 // import { router, useLocalSearchParams } from "expo-router";
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as ImagePicker from 'expo-image-picker'; 
+import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Crypto from 'expo-crypto';
-
-type Foto = {
-  uri: string;
-};
+import { Feather, FontAwesome } from "@expo/vector-icons";
 
 type Questao = {
-    id: string;
-    descricao: string;
-    resposta?: 'C' | 'NC' | 'NA' | '';
-    observacao?: string;
-    fotos?: Foto[];
-    videos?: Foto[];
+    descricao: string,
+    exige_foto: boolean,
+    exige_observacao: boolean,
+    exige_video: boolean,
+    fotos: { uri: string }[],
+    id: string,
+    observacao: string,
+    resposta: "C" | "NC" | "NA" | "",
+    videos: { uri: string }[]
 }
 
 type Props = {
@@ -46,10 +46,10 @@ async function generateUUID(): Promise<string> {
     return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
 }
 
-let nomeUsuario:any = '';
+let nomeUsuario: any = '';
 
 export default function FormChecklist() {
-     
+
     const [questoes, setQuestoes] = useState<Questao[]>([]);
 
     const { perguntasDoModelo, nomeModelo, objetivoModelo, exigeEquipamento, idObra } = useLocalSearchParams();
@@ -58,8 +58,8 @@ export default function FormChecklist() {
 
     useEffect(() => {
         //below get a asyncstorage var called nomeUsuario and print it in the console
-        const getNomeUsuario = async () => { 
-            nomeUsuario = await AsyncStorage.getItem("nomeUsuario"); 
+        const getNomeUsuario = async () => {
+            nomeUsuario = await AsyncStorage.getItem("nomeUsuario");
             console.log("Nome do usuário logado: ", nomeUsuario);
         }
         getNomeUsuario();
@@ -74,13 +74,16 @@ export default function FormChecklist() {
 
         const parsedPerguntas = JSON.parse(perguntasDoModelo as string || '[]');
 
-        const inicial = parsedPerguntas.map((p:any, index: number) => ({
+        const inicial = parsedPerguntas.map((p: any, index: number) => ({
             id: index,
             descricao: p.descricao,
             resposta: '',
             observacao: '',
             fotos: [],
-            videos: []
+            videos: [],
+            exige_foto: p.exige_foto,
+            exige_video: p.exige_video,
+            exige_observacao: p.exige_observacao,
         }));
 
         setQuestoes(inicial);
@@ -90,20 +93,20 @@ export default function FormChecklist() {
     function atualizarQuestao(id: string, dados: Partial<Questao>) {
         setQuestoes((prev) =>
             prev.map((q) => {
-            if (q.id !== id) return q;
+                if (q.id !== id) return q;
 
-            return {
-                ...q,
-                ...dados,
-                fotos: [
-                ...(q.fotos || []),
-                ...(dados.fotos || [])
-                ],
-                videos: [
-                ...(q.videos || []),
-                ...(dados.videos || [])
-                ]
-            };
+                return {
+                    ...q,
+                    ...dados,
+                    fotos: [
+                        ...(q.fotos || []),
+                        ...(dados.fotos || [])
+                    ],
+                    videos: [
+                        ...(q.videos || []),
+                        ...(dados.videos || [])
+                    ]
+                };
             })
         );
     }
@@ -111,12 +114,12 @@ export default function FormChecklist() {
 
     function selecionarResposta(id: string, valor: 'C' | 'NC' | 'NA') {
         atualizarQuestao(id, {
-        resposta: valor,
-        ...(valor !== 'NC' && {
-            observacao: '',
-            fotos: [],
-            videos: [],
-        }),
+            resposta: valor,
+            ...(valor !== 'NC' && {
+                observacao: '',
+                fotos: [],
+                videos: [],
+            }),
         });
     }
 
@@ -144,45 +147,45 @@ export default function FormChecklist() {
     const selecionarImagem = async (id: string) => {
         Alert.alert('Selecionar imagem', '', [
             {
-            text: 'Câmera',
-            onPress: async () => {
-                const { status } = await ImagePicker.requestCameraPermissionsAsync();
-                if (status !== 'granted') return;
+                text: 'Câmera',
+                onPress: async () => {
+                    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+                    if (status !== 'granted') return;
 
-                const res = await ImagePicker.launchCameraAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                quality: 0.7,
-                });
+                    const res = await ImagePicker.launchCameraAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        quality: 0.7,
+                    });
 
-                if (!res.canceled) {
-                atualizarQuestao(id, {
-                    fotos: res.assets.map(a => ({ uri: a.uri }))
-                });
+                    if (!res.canceled) {
+                        atualizarQuestao(id, {
+                            fotos: res.assets.map(a => ({ uri: a.uri }))
+                        });
+                    }
                 }
-            }
             },
             {
-            text: 'Galeria',
-            onPress: async () => {
-                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-                if (status !== 'granted') return;
+                text: 'Galeria',
+                onPress: async () => {
+                    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                    if (status !== 'granted') return;
 
-                const res = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsMultipleSelection: true,
-                quality: 0.7,
-                });
+                    const res = await ImagePicker.launchImageLibraryAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        allowsMultipleSelection: true,
+                        quality: 0.7,
+                    });
 
-                if (!res.canceled) {
-                atualizarQuestao(id, {
-                    fotos: res.assets.map(a => ({ uri: a.uri }))
-                });
+                    if (!res.canceled) {
+                        atualizarQuestao(id, {
+                            fotos: res.assets.map(a => ({ uri: a.uri }))
+                        });
+                    }
                 }
-            }
             },
             {
-            text: 'Cancelar',
-            style: 'cancel'
+                text: 'Cancelar',
+                style: 'cancel'
             }
         ]);
     };
@@ -190,45 +193,45 @@ export default function FormChecklist() {
     const selecionarVideo = async (id: string) => {
         Alert.alert('Selecionar vídeo', '', [
             {
-            text: 'Câmera',
-            onPress: async () => {
-                const { status } = await ImagePicker.requestCameraPermissionsAsync();
-                if (status !== 'granted') return;
+                text: 'Câmera',
+                onPress: async () => {
+                    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+                    if (status !== 'granted') return;
 
-                const res = await ImagePicker.launchCameraAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-                quality: 0.7,
-                });
+                    const res = await ImagePicker.launchCameraAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+                        quality: 0.7,
+                    });
 
-                if (!res.canceled) {
-                atualizarQuestao(id, {
-                    videos: res.assets.map(a => ({ uri: a.uri }))
-                });
+                    if (!res.canceled) {
+                        atualizarQuestao(id, {
+                            videos: res.assets.map(a => ({ uri: a.uri }))
+                        });
+                    }
                 }
-            }
             },
             {
-            text: 'Galeria',
-            onPress: async () => {
-                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-                if (status !== 'granted') return;
+                text: 'Galeria',
+                onPress: async () => {
+                    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                    if (status !== 'granted') return;
 
-                const res = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-                allowsMultipleSelection: true,
-                quality: 0.7,
-                });
+                    const res = await ImagePicker.launchImageLibraryAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+                        allowsMultipleSelection: true,
+                        quality: 0.7,
+                    });
 
-                if (!res.canceled) {
-                atualizarQuestao(id, {
-                    videos: res.assets.map(a => ({ uri: a.uri }))
-                });
+                    if (!res.canceled) {
+                        atualizarQuestao(id, {
+                            videos: res.assets.map(a => ({ uri: a.uri }))
+                        });
+                    }
                 }
-            }
             },
             {
-            text: 'Cancelar',
-            style: 'cancel'
+                text: 'Cancelar',
+                style: 'cancel'
             }
         ]);
     };
@@ -265,11 +268,27 @@ export default function FormChecklist() {
     };
 
     async function handleSubmit() {
-        console.log('Checklist a ser enviada:', questoes);
-        
+
+        // console.log('Checklist a ser enviada:', questoes);
+
         //se form não é valido
-        if (!formularioValidoNC()) {
-            alert('Preencha a observação para itens não conformes');
+        // if (!formularioValidoNC()) {
+        //     alert('Preencha a observação para itens não conformes');
+        //     return;
+        // }
+
+        //Verificando se todas perguntas foram respondidas
+        const perguntasNaoRespondidas = questoes.filter(q => q.resposta == "");
+        if (perguntasNaoRespondidas.length > 0) {
+            Alert.alert("Atenção", "Responda todas as perguntas do checklist.");
+            return;
+        }
+
+        //Validando se campos obrigatórios foram preenchidos
+        const perguntasSemCamposObrigatorios = questoes.filter(q => (q.exige_foto && q.resposta == 'NC' && q.fotos.length == 0) || (q.exige_video && q.resposta == 'NC' && q.videos.length == 0) || (q.exige_observacao && q.resposta == 'NC' && q.observacao == ""));
+
+        if (perguntasSemCamposObrigatorios.length > 0) {
+            Alert.alert("Atenção", "Informe todos os campos obrigatórios das perguntas respondidas com NC (não conforme)");
             return;
         }
 
@@ -286,41 +305,47 @@ export default function FormChecklist() {
         formData.append('localizacao', localizacao as string);
         formData.append('data_hora_criacao', new Date().toISOString());
         formData.append('status', '1');
-        
+
         // 2. manda as fotos e vídeos separadas
         questoes.forEach((q) => {
             q.fotos?.forEach((foto, i) => {
-            formData.append(`fotos_${q.id}`, {
-                uri: foto.uri,
-                name: `foto_${i}.jpg`,
-                type: 'image/jpeg'
-            } as any);
+                const fileName = `${uuid}_foto_${q.id}_${i}.jpg`;
+
+                formData.append(`fotos_${q.id}`, {
+                    uri: foto.uri,
+                    name: fileName,
+                    type: 'image/jpeg'
+                } as any);
             });
+
             q.videos?.forEach((video, i) => {
-            formData.append(`videos_${q.id}`, {
-                uri: video.uri,
-                name: `video_${i}.mp4`,
-                type: 'video/mp4'
-            } as any);
+                const fileName = `${uuid}_video_${q.id}_${i}.mp4`;
+
+                formData.append(`videos_${q.id}`, {
+                    uri: video.uri,
+                    name: fileName,
+                    type: 'video/mp4'
+                } as any);
             });
         });
 
-        formData.append('respostas', JSON.stringify(questoes.map((q) => ({
+        formData.append('respostas', JSON.stringify(
+            questoes.map((q) => ({
                 id: q.id,
                 descricao: q.descricao,
                 resposta: q.resposta,
                 observacao: q.observacao,
-                fotos: q.fotos?.map((f) => f.uri.split('/').pop() || '') || [],
-                videos: q.videos?.map((v) => v.uri.split('/').pop() || '') || []
-            })))
-        );
-            
+                fotos: q.fotos?.map((_, i) => `${uuid}_foto_${q.id}_${i}.jpg`) || [],
+                videos: q.videos?.map((_, i) => `${uuid}_video_${q.id}_${i}.mp4`) || []
+            }))
+        ));
+
         console.log('FormData preparado para envio:', formData);
 
         setIsSubmitting(true);
         try {
             //http://10.10.2.200:3005/api/v1/checklist/
-            await api.post('v1/checklist/', formData, {
+            await api.post('checklist/', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -330,7 +355,7 @@ export default function FormChecklist() {
             } else {
                 Alert.alert('Sucesso', 'Checklist enviada');
             }
-            router.navigate('/minhas-checklists');
+            router.back();
         } catch (error: any) {
             console.error(error.response || error);
             if (Platform.OS === 'android') {
@@ -343,108 +368,105 @@ export default function FormChecklist() {
         }
     }
 
-    return(
+    return (
         <View className="flex-1">
             <StatusBar
-            backgroundColor="#1976D2"
-            translucent={false}
+                backgroundColor="#1976D2"
+                translucent={false}
             />
             <SafeAreaView className="flex-1 bg-white">
-            <ScrollView className="flex-1 bg-white p-4">
-                <Text className="text-2xl font-bold mb-6 mt-2">{nomeModelo}</Text>
-                {/* <Text className="text-md font-bold mb-6 text-gray-400">{objetivoModelo}</Text> */}
-                <Text className="text-md font-bold mb-6 text-gray-400">Preencha as informações</Text>
-                
-                {/* Need a loading bar based number of questions asked to 100% */}
-                <View className="mb-4">
-                    <Text className="text-right text-xs text-gray-500 mb-1">
-                        {Math.round((questoes.filter(q => q.resposta).length / questoes.length * 100))}
-                    </Text>
-                    <View className="w-full bg-gray-200 rounded-full h-2.5">
-                        <View 
-                            className="bg-green-600 h-2.5 rounded-full" 
-                            style={{ width: `${(questoes.filter(q => q.resposta).length / questoes.length * 100)}%` }}
-                        />
-                    </View>
-                </View>
+                <ScrollView className="flex-1 bg-white px-4">
+                    <Text className="text-2xl font-bold mb-6">{nomeModelo}</Text>
+                    {/* <Text className="text-md font-bold mb-6 text-gray-400">{objetivoModelo}</Text> */}
+                    <Text className="text-md font-bold mb-6 text-gray-400">Preencha as informações</Text>
 
-                <View className="gap-4">
-
+                    {/* Need a loading bar based number of questions asked to 100% */}
                     <View className="mb-4">
-                        <Text className="text-lg font-bold text-gray-800 mb-2">Localização</Text>
-                        <TextInput
-                            placeholder="Digite a localização..."
-                            value={localizacao}
-                            onChangeText={setLocalizacao}
-                            className="border border-gray-300 rounded-lg p-3 text-gray-800"
-                        />
+                        <Text className="text-right text-xs text-gray-500 mb-1">
+                            {Math.round((questoes.filter(q => q.resposta).length / questoes.length * 100))}
+                        </Text>
+                        <View className="w-full bg-gray-200 rounded-full h-2.5">
+                            <View
+                                className="bg-green-600 h-2.5 rounded-full"
+                                style={{ width: `${(questoes.filter(q => q.resposta).length / questoes.length * 100)}%` }}
+                            />
+                        </View>
                     </View>
 
-                {questoes.map((questao: any, index: any) => (
-                    <View
-                    key={index}
-                    className="bg-white rounded-xl p-5 shadow-md border border-gray-200"
-                    >
-                    {/* TÍTULO */}
-                    <Text className="text-lg font-bold text-gray-800 mb-4">
-                        {questao.descricao}
-                    </Text>
+                    <View className="gap-4">
 
-                    {/* BOTÕES */}
-                    <View className="flex-row justify-between gap-2 mb-3">
+                        <View className="mb-4">
+                            <Text className="text-lg font-bold text-gray-800 mb-2">Localização</Text>
+                            <TextInput
+                                placeholder="Digite a localização..."
+                                value={localizacao}
+                                onChangeText={setLocalizacao}
+                                className="border border-gray-300 rounded-lg p-3 text-gray-800"
+                            />
+                        </View>
 
-                        <Pressable
-                        onPress={() => selecionarResposta(questao.id, 'C')}
-                        className={`flex-1 py-3 rounded-lg items-center ${
-                            questao.resposta === 'C'
-                            ? 'bg-green-600'
-                            : 'bg-green-200'
-                        }`}
-                        >
-                        <Text className="font-bold text-white">C</Text>
-                        </Pressable>
+                        {questoes.map((questao: any, index: any) => (
+                            <View
+                                key={index}
+                                className="bg-white rounded-xl p-5 shadow-md border border-gray-200"
+                            >
+                                {/* TÍTULO */}
+                                <Text className="text-lg font-bold text-gray-800 mb-4">
+                                    {questao.descricao}
+                                </Text>
+
+                                {/* BOTÕES */}
+                                <View className="flex-row justify-between gap-2 mb-3">
+
+                                    <Pressable
+                                        onPress={() => selecionarResposta(questao.id, 'C')}
+                                        className={`flex-1 py-3 rounded-lg items-center ${questao.resposta === 'C'
+                                            ? 'bg-green-600'
+                                            : 'bg-green-200'
+                                            }`}
+                                    >
+                                        <Text className="font-bold text-white">C</Text>
+                                    </Pressable>
 
 
-                        <Pressable
-                        onPress={() => selecionarResposta(questao.id, 'NC')}
-                        className={`flex-1 py-3 rounded-lg items-center ${
-                            questao.resposta === 'NC'
-                            ? 'bg-red-600'
-                            : 'bg-red-200'
-                        }`}
-                        >
-                        <Text className="font-bold text-white">NC</Text>
-                        </Pressable>
+                                    <Pressable
+                                        onPress={() => selecionarResposta(questao.id, 'NC')}
+                                        className={`flex-1 py-3 rounded-lg items-center ${questao.resposta === 'NC'
+                                            ? 'bg-red-600'
+                                            : 'bg-red-200'
+                                            }`}
+                                    >
+                                        <Text className="font-bold text-white">NC</Text>
+                                    </Pressable>
 
-                        <Pressable
-                        onPress={() => selecionarResposta(questao.id, 'NA')}
-                        className={`flex-1 py-3 rounded-lg items-center ${
-                            questao.resposta === 'NA'
-                            ? 'bg-gray-700'
-                            : 'bg-gray-300'
-                        }`}
-                        >
-                        <Text className="font-bold text-white">NA</Text>
-                        </Pressable>
-                    </View> 
+                                    <Pressable
+                                        onPress={() => selecionarResposta(questao.id, 'NA')}
+                                        className={`flex-1 py-3 rounded-lg items-center ${questao.resposta === 'NA'
+                                            ? 'bg-gray-700'
+                                            : 'bg-gray-300'
+                                            }`}
+                                    >
+                                        <Text className="font-bold text-white">NA</Text>
+                                    </Pressable>
+                                </View>
 
-                    {/* SE FOR NÃO CONFORME */}
-                    {questao.resposta === 'NC' && (
-                        <View className="mt-2 gap-3">
+                                {/* SE FOR NÃO CONFORME */}
+                                {questao.resposta === 'NC' && (
+                                    <View className="mt-2 gap-3">
 
-                        <TextInput
-                            placeholder="Descreva o problema..."
-                            multiline
-                            value={questao.observacao}
-                            onChangeText={(text) =>
-                            atualizarQuestao(questao.id, { observacao: text })
-                            }
-                            className="border border-gray-300 rounded-lg p-3 min-h-[80px] text-gray-800"
-                        />
+                                        <TextInput
+                                            placeholder="Descreva o problema..."
+                                            multiline
+                                            value={questao.observacao}
+                                            onChangeText={(text) =>
+                                                atualizarQuestao(questao.id, { observacao: text })
+                                            }
+                                            className="border border-gray-300 align-top rounded-lg p-3 min-h-[80px] text-gray-800"
+                                        />
 
-                        <View className="flex-row gap-3">
+                                        <View className="flex-row gap-3">
 
-                            {/* <Pressable
+                                            {/* <Pressable
                             onPress={() => console.log('Adicionar Foto')}
                             className="flex-1 bg-blue-600 py-3 rounded-lg items-center"
                             >
@@ -461,33 +483,35 @@ export default function FormChecklist() {
 
                             </Text>
                             </Pressable> */}
-                            <TouchableOpacity className="flex-1 bg-blue-600 py-3 rounded-lg items-center"  onPress={() => selecionarImagem(questao.id)}>
-                            <Text>📸 Foto</Text>
-                            </TouchableOpacity>
+                                            <TouchableOpacity className="flex-1 bg-slate-800 py-3 rounded-lg items-center" onPress={() => selecionarImagem(questao.id)}>
+                                                <Text className="text-white font-semibold gap-1"><FontAwesome name="picture-o" size={16} color="white" /> Foto</Text>
+                                            </TouchableOpacity>
 
-                            <TouchableOpacity
-                            onPress={() => selecionarVideo(questao.id)}
-                            className="flex-1 bg-purple-600 py-3 rounded-lg items-center"
-                            >
-                            <Text className="text-white font-semibold">
-                                🎥 Add Vídeo
-                            </Text>
-                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                onPress={() => selecionarVideo(questao.id)}
+                                                className="flex-1 bg-slate-800 py-3 rounded-lg items-center"
+                                            >
+                                                <Text className="text-white font-semibold gap-1">
+                                                    <Feather name="video" size={16} color="white" /> Vídeo
+                                                </Text>
+                                            </TouchableOpacity>
 
-                        </View>
-
-                        </View>
-                    )}
+                                        </View>
+                                        {questao.exige_foto && <Text className="text-red-600 font-medium">Foto obrigatória*</Text>}
+                                        {questao.exige_video && <Text className="text-red-600 font-medium">Vídeo obrigatório*</Text>}
+                                        {questao.exige_observacao && <Text className="text-red-600 font-medium">Observação obrigatória*</Text>}
+                                    </View>
+                                )}
+                            </View>
+                        ))}
                     </View>
-                ))}
-                </View>
 
-                <View className="mt-6 mb-10">
-                    <Button onPress={() => handleSubmit()} disabled={isSubmitting} class="bg-green-600">
-                        <Text className="text-white font-bold">{isSubmitting ? 'Enviando...' : 'Enviar'}</Text>
-                    </Button>
-                </View>
-            </ScrollView>
+                    <View className="mt-6 mb-10">
+                        <Button onPress={() => handleSubmit()} disabled={isSubmitting} class="bg-green-600">
+                            <Text className="text-white font-bold">{isSubmitting ? 'Enviando...' : 'Enviar'}</Text>
+                        </Button>
+                    </View>
+                </ScrollView>
             </SafeAreaView>
         </View>
     );
