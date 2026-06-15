@@ -153,8 +153,8 @@ export default function FormChecklist() {
                     if (status !== 'granted') return;
 
                     const res = await ImagePicker.launchCameraAsync({
-                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                        quality: 0.7,
+                        mediaTypes: "images",
+                        quality: 0.3,
                     });
 
                     if (!res.canceled) {
@@ -171,9 +171,9 @@ export default function FormChecklist() {
                     if (status !== 'granted') return;
 
                     const res = await ImagePicker.launchImageLibraryAsync({
-                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                        allowsMultipleSelection: true,
-                        quality: 0.7,
+                        mediaTypes: 'images',
+                        allowsMultipleSelection: false,
+                        quality: 0.3,
                     });
 
                     if (!res.canceled) {
@@ -199,8 +199,8 @@ export default function FormChecklist() {
                     if (status !== 'granted') return;
 
                     const res = await ImagePicker.launchCameraAsync({
-                        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-                        quality: 0.7,
+                        mediaTypes: "videos",
+                        quality: 0.3,
                     });
 
                     if (!res.canceled) {
@@ -217,9 +217,9 @@ export default function FormChecklist() {
                     if (status !== 'granted') return;
 
                     const res = await ImagePicker.launchImageLibraryAsync({
-                        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-                        allowsMultipleSelection: true,
-                        quality: 0.7,
+                        mediaTypes: "videos",
+                        allowsMultipleSelection: false,
+                        quality: 0.3,
                     });
 
                     if (!res.canceled) {
