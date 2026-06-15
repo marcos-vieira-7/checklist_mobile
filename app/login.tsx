@@ -25,6 +25,8 @@ export default function Login() {
         try {
             console.log(process.env.EXPO_PUBLIC_BASE_URL);
 
+            Alert.alert("EXPO_PUBLIC_BASE_URL", process.env.EXPO_PUBLIC_BASE_URL);
+
             console.log("Realizando login Before");
             const response = await api.post('auth/login', { login: user, senha: password });
             console.log("Realiza login AFTER");

@@ -23,7 +23,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.pelicano.checklist"
+      "package": "com.pelicano.checklist",
+      "useCleartextTraffic": true
     },
     "web": {
       "bundler": "metro",
