@@ -44,8 +44,8 @@ export default function MenuModelos() {
             />
             <SafeAreaView className="flex-1 bg-white">
                 <ScrollView className="flex-1 bg-white px-4">
-                    <Text className="text-2xl font-bold mb-2">Modelos</Text>
-                    <Text className="text-md font-bold mb-6 text-gray-400">Escolha um modelo</Text>
+                    <Text className="text-2xl font-semibold mb-0 mt-6 text-slate-700">Modelos de Checklist</Text>
+                    <Text className="text-md font-semibold mb-6 text-gray-400">Escolha um modelo para começar a preencher</Text>
 
                     <View className="gap-4">
                         <Input value={busca} onChangeText={(text) => setBusca(text)} placeholder="Procurar modelos de checklist..." />

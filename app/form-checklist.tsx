@@ -376,7 +376,7 @@ export default function FormChecklist() {
             />
             <SafeAreaView className="flex-1 bg-white">
                 <ScrollView className="flex-1 bg-white px-4">
-                    <Text className="text-2xl font-bold mb-6">{nomeModelo}</Text>
+                    <Text className="text-2xl font-semibold mt-6">{nomeModelo}</Text>
                     {/* <Text className="text-md font-bold mb-6 text-gray-400">{objetivoModelo}</Text> */}
                     <Text className="text-md font-bold mb-6 text-gray-400">Preencha as informações</Text>
 
