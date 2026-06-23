@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
-import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar, ScrollView } from "react-native";
+import { Text, View, Pressable, StatusBar, ScrollView } from "react-native";
 import Input from "./components/Input";
-import Button from "./components/Button";
 import { router } from 'expo-router';
 import { SafeAreaView } from "react-native-safe-area-context";
-import api from "../services/api";
-import { getCategories } from "../services/categories";
 import { CategoryProps } from "../types/category";
-import { getAllWorks } from "../services/works";
 import { WorkProps } from "../types/work";
 import { MaterialIcons } from "@expo/vector-icons";
+import { getWorksOffline } from "../database/works";
+import { getCategoriesOffline } from "../database/categories";
 
 export default function MenuCategorias() {
 
@@ -23,14 +21,14 @@ export default function MenuCategorias() {
     }, []);
 
     const buscarCategorias = async () => {
-        const result = await getCategories();
+        const result = await getCategoriesOffline();
         if (result) {
             setCategorias(result);
         }
     }
 
     const buscarObras = async () => {
-        const result = await getAllWorks();
+        const result = await getWorksOffline();
         if (result) {
             setObras(result);
         }

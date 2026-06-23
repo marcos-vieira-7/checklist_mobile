@@ -9,11 +9,13 @@ export interface ChecklistProps {
     data_hora_edicao?: string | null,
     respostas?: ChecklistAnswersProps[] | null,
     status?: number | null,
+    equipamento?: string | null,
     createdAt?: string | null,
     updatedAt?: string | null
 }
 
 export interface ChecklistAnswersProps {
+    id?: string | undefined,
     descricao: string | null,
     resposta: "C" | "NC" | "NA" | null,
     observacao?: string | null,

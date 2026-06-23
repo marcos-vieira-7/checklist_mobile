@@ -4,10 +4,10 @@ import Input from "./components/Input";
 import Button from "./components/Button";
 import { useNetInfo } from '@react-native-community/netinfo';
 import { api } from "../utils/axios";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
-
+import { updateLocalDatabase } from "../services/sync";
 
 export default function Login() {
     const { isConnected } = useNetInfo();
@@ -21,22 +21,37 @@ export default function Login() {
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        checkSessionOffline();
+    }, [isConnected]);
+
+    const checkSessionOffline = async () => {
+        const accessToken = await AsyncStorage.getItem('accessToken');
+        const refreshToken = await AsyncStorage.getItem('refreshToken');
+        const nomeUsuario = await AsyncStorage.getItem('nomeUsuario');
+        if (accessToken && refreshToken && nomeUsuario && !isConnected) {
+            ToastAndroid.show("Restaurando sessão offline", ToastAndroid.SHORT);
+            router.navigate('/menu-categorias');
+        }
+    }
+
     const handleLogin = async (user: string, password: string) => {
         try {
-            console.log(process.env.EXPO_PUBLIC_BASE_URL);
-
-            Alert.alert("EXPO_PUBLIC_BASE_URL", process.env.EXPO_PUBLIC_BASE_URL);
-
-            console.log("Realizando login Before");
             const response = await api.post('auth/login', { login: user, senha: password });
-            console.log("Realiza login AFTER");
             if (response.status == 200) {
-                console.log("Login realizado com sucesso", response.data);
-                return response.data;
+
+                //Analisando se o usuário tem permissão no aplicativo
+                if (response.data.profile.acesso_app) {
+                    return response.data;
+                }
+                else {
+                    Alert.alert("Acesso negado", "Você não possui permissão para acessar o aplicativo!");
+                    return;
+                }
             }
         } catch ({ response }: any) {
             if (response.status == 401) {
-                Alert.alert("Usuário ou Senha Incorreta", response.data.message);
+                Alert.alert("Usuário ou senha incorretos", "Verifique seu usuário e senha e tente novamente.");
                 setLoading(false);
                 return false;
             }
@@ -70,23 +85,6 @@ export default function Login() {
             setCodeSent(true);
         }
     }
-
-    // const checkSession = async () => {
-    //     const token = await getSession("token");
-
-    //     //Verificando se existem atualizações disponíveis para Android
-    //     if (Platform.OS == 'android') {
-    //         const updateAvailable = await checkUpdates();
-    //         // if (updateAvailable && sugeriuAtualizacao != 'sim') {
-    //         if (updateAvailable) {
-    //             router.navigate({ pathname: '/update', params: { autenticado: token } });
-    //             return;
-    //         }
-    //     }
-    //     if (token) {
-    //         router.navigate("/modulos/checklist");
-    //     }
-    // }
 
     const handleConfirmPassword = async () => {
         if (newPassword != confirmNewPassword) {
@@ -126,19 +124,22 @@ export default function Login() {
             ToastAndroid.show("Conectando ao servidor, aguarde", ToastAndroid.LONG);
         }
         //TODO:
-        const { accessToken, refreshToken } = await handleLogin(login, password);
-        //Salvar tokens no AsyncStorage
-        await AsyncStorage.setItem("accessToken", accessToken);
-        await AsyncStorage.setItem("refreshToken", refreshToken);
-        await AsyncStorage.setItem("nomeUsuario", login);
+        const response = await handleLogin(login, password);
 
-        // const accessToken = "1234567890";
-        if (accessToken) {
+        if (response && response.accessToken) {
+            //Salvar tokens no AsyncStorage
+            await AsyncStorage.setItem("accessToken", response.accessToken);
+            await AsyncStorage.setItem("refreshToken", response.refreshToken);
+            await AsyncStorage.setItem("nomeUsuario", login);
             console.log("Atualizando banco de dados");
             // await updateDatabase({ filial, centroDeCusto, localDeEstoque, localizacao, equipamento, categoria, produto, accessToken, nomeUsuario, classificacao, funcoes });
             if (Platform.OS == 'android') {
                 ToastAndroid.show("Base local atualizada", ToastAndroid.SHORT);
             }
+
+            //Atualizando banco de dados local
+            updateLocalDatabase();
+
             console.log("Navegando para menu categorias");
             setLoading(false);
             try {
@@ -163,8 +164,8 @@ export default function Login() {
             />
 
             <Image
-                source={require('../assets/images/almox.jpeg')} // Caminho da imagem
-                className="w-32 h-32 mb-5 rounded-full" // Tamanho da imagem (ajuste conforme necessário)
+                source={require('../assets/images/logo.png')} // Caminho da imagem
+                className="w-36 h-36 mb-5 rounded-full" // Tamanho da imagem (ajuste conforme necessário)
                 resizeMode="contain" // Ajusta a imagem para caber dentro do container sem cortar
             />
 
