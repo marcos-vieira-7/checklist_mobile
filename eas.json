@@ -8,7 +8,7 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_BASE_URL": "http://10.10.2.200:3005/api/v1/"
+        "EXPO_PUBLIC_BASE_URL": "https://checklist.pelicano.eng.br/api/v1/"
       },
       "channel": "development"
     },
@@ -18,14 +18,14 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_BASE_URL": "http://10.10.2.200:3005/api/v1/"
+        "EXPO_PUBLIC_BASE_URL": "https://checklist.pelicano.eng.br/api/v1/"
       },
       "channel": "preview"
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_BASE_URL": "http://10.10.2.200:3005/api/v1/"
+        "EXPO_PUBLIC_BASE_URL": "https://checklist.pelicano.eng.br/api/v1/"
       },
       "android": {
         "buildType": "app-bundle"
