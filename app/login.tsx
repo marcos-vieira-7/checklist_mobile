@@ -138,7 +138,7 @@ export default function Login() {
             }
 
             //Atualizando banco de dados local
-            updateLocalDatabase();
+            await updateLocalDatabase();
 
             console.log("Navegando para menu categorias");
             setLoading(false);
