@@ -11,10 +11,12 @@ import Button from "./components/Button";
 import { deleteChecklistOffline, getChecklistsOffline } from "../database/checklists";
 import { ChecklistProps } from "../types/checklist";
 import { sendRegisters } from "../services/sync";
+import { useNetInfo } from "@react-native-community/netinfo";
 
 export default function MenuModelos() {
 
     const { idObra } = useLocalSearchParams();
+    const { isConnected } = useNetInfo();
     const [modelos, setModelos] = useState<ModelProps[]>([]);
     const [busca, setBusca] = useState<string>("");
     const [abaSelecionada, setAbaSelecionada] = useState<"novo" | "salvos">("novo");
@@ -126,68 +128,68 @@ export default function MenuModelos() {
 
                         <View className="gap-4">
                             {/* <Input value={busca} onChangeText={(text) => setBusca(text)} placeholder="Procurar modelos de checklist..." /> */}
-                            {checklists.length > 0 &&
+                            {checklists.length > 0 && isConnected &&
                                 <Pressable disabled={sincronizando} onPress={handleSync} className={`flex flex-row w-fit justify-end px-4 py-2 rounded-lg bg-blue-200 self-end ${sincronizando ? 'opacity-50' : 'opacity-100'}`}>
                                     {sincronizando ? <View className="flex flex-row items-center gap-3"><ActivityIndicator /><Text className="text-blue-600 font-semibold text-lg">Sincronizando...</Text></View> : <View className="mr-1 text-blue-600 font-medium text-lg flex flex-row items-center gap-1"><AntDesign name="sync" size={16} color="#2563eb" /><Text className="ml-2 text-lg text-blue-600 font-medium">Sincronizar tudo</Text></View>}
                                 </Pressable>
                             }
-                            {checklists.map((checklist: ChecklistProps) => {
-                                return (
-                                    <Pressable
-                                        key={checklist.uuid}
-                                        onPress={() => router.navigate({
-                                            pathname: '/form-checklist',
-                                            params: {
-                                                perguntasDoModelo: JSON.stringify(checklist.respostas),
-                                                nomeModelo: checklist.modelo,
-                                                objetivoModelo: modelos.find(m => m.nome == checklist.modelo)?.objetivo,
-                                                exigeEquipamento: modelos.find(m => m.nome == checklist.modelo)?.exige_equipamento as any,
-                                                idObra: idObra,
-                                                uuidChecklist: checklist.uuid,
-                                                perguntasDomodelo: modelos.find(m => m.nome == checklist.modelo)?.perguntas,
-                                                localizacaoChecklist: checklist.localizacao,
-                                                equipamentoChecklist: checklist.equipamento
-                                            }
-                                        })
+                        {checklists.map((checklist: ChecklistProps) => {
+                            return (
+                                <Pressable
+                                    key={checklist.uuid}
+                                    onPress={() => router.navigate({
+                                        pathname: '/form-checklist',
+                                        params: {
+                                            perguntasDoModelo: JSON.stringify(checklist.respostas),
+                                            nomeModelo: checklist.modelo,
+                                            objetivoModelo: modelos.find(m => m.nome == checklist.modelo)?.objetivo,
+                                            exigeEquipamento: modelos.find(m => m.nome == checklist.modelo)?.exige_equipamento as any,
+                                            idObra: idObra,
+                                            uuidChecklist: checklist.uuid,
+                                            perguntasDomodelo: modelos.find(m => m.nome == checklist.modelo)?.perguntas,
+                                            localizacaoChecklist: checklist.localizacao,
+                                            equipamentoChecklist: checklist.equipamento
                                         }
-                                        className="bg-slate-100 border-l-2 border-blue-500 rounded-lg p-6 h-32 justify-center">
-                                        <View className="flex flex-row items-center justify-between">
-                                            <View>
-                                                <View className="text-white text-xl flex flex-row items-center font-bold gap-2">
-                                                    <Feather name="check-square" size={22} color="#333" /><Text className="text-xl text-slate-800 font-bold">{checklist.modelo}</Text>
-                                                </View>
-                                                <View className="text-blue-100 flex flex-row text-sm mt-2">
-                                                    <Text className="text-slate-800 font-bold">Localização: </Text><Text className="text-slate-800">{checklist.localizacao}</Text>
-                                                </View>
-                                                <View className="text-blue-100 flex flex-row text-sm mt-1">
-                                                    <Text className="text-slate-800 font-bold">Criado em: </Text><Text className="text-slate-800">{new Date(checklist.data_hora_criacao || "").toLocaleDateString() + " as " + new Date(checklist.data_hora_criacao || "").toLocaleTimeString()}</Text>
-                                                </View>
+                                    })
+                                    }
+                                    className="bg-slate-100 border-l-2 border-blue-500 rounded-lg p-6 h-32 justify-center">
+                                    <View className="flex flex-row items-center justify-between">
+                                        <View>
+                                            <View className="text-white text-xl flex flex-row items-center font-bold gap-2">
+                                                <Feather name="check-square" size={22} color="#333" /><Text className="text-xl text-slate-800 font-bold">{checklist.modelo}</Text>
                                             </View>
-                                            <Button onPress={() => Alert.alert("Atenção", "Deseja excluir o checklist salvo?", [
-                                                {
-                                                    text: "Não"
-                                                },
-                                                {
-                                                    text: "Sim",
-                                                    onPress: () => checklist.uuid ? deleteChecklist(checklist.uuid) : null
-                                                }
-                                            ])} class="bg-transparent pr-0">
-                                                <FontAwesome name="trash-o" size={24} color={"#dc2626"} />
-                                            </Button>
+                                            <View className="text-blue-100 flex flex-row text-sm mt-2">
+                                                <Text className="text-slate-800 font-bold">Localização: </Text><Text className="text-slate-800">{checklist.localizacao}</Text>
+                                            </View>
+                                            <View className="text-blue-100 flex flex-row text-sm mt-1">
+                                                <Text className="text-slate-800 font-bold">Criado em: </Text><Text className="text-slate-800">{new Date(checklist.data_hora_criacao || "").toLocaleDateString() + " as " + new Date(checklist.data_hora_criacao || "").toLocaleTimeString()}</Text>
+                                            </View>
                                         </View>
-                                    </Pressable>
-                                )
-                            })}
-                            {checklists.length == 0 &&
-                                <View className="flex flex-row flex-1 mt-10 justify-center">
-                                    <Text className="text-slate-500 font-medium opacity-50">Nenhum checklist encontrado</Text>
-                                </View>
-                            }
-                        </View>
+                                        <Button onPress={() => Alert.alert("Atenção", "Deseja excluir o checklist salvo?", [
+                                            {
+                                                text: "Não"
+                                            },
+                                            {
+                                                text: "Sim",
+                                                onPress: () => checklist.uuid ? deleteChecklist(checklist.uuid) : null
+                                            }
+                                        ])} class="bg-transparent pr-0">
+                                            <FontAwesome name="trash-o" size={24} color={"#dc2626"} />
+                                        </Button>
+                                    </View>
+                                </Pressable>
+                            )
+                        })}
+                        {checklists.length == 0 &&
+                            <View className="flex flex-row flex-1 mt-10 justify-center">
+                                <Text className="text-slate-500 font-medium opacity-50">Nenhum checklist encontrado</Text>
+                            </View>
+                        }
+                    </View>
                     </ScrollView>
                 }
-            </View>
         </View>
+        </View >
     );
 
 }

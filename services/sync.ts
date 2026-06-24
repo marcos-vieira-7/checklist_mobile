@@ -45,9 +45,6 @@ export async function sendRegisters(): Promise<boolean> {
         for (const checklist of checklists) {
             const formData = new FormData();
 
-            // console.log(checklist.respostas);
-            // return true
-
             formData.append('uuid', checklist.uuid as string);
             formData.append('modelo', checklist.modelo as string);
             formData.append('id_obra', checklist.id_obra?.toString() as string);
@@ -58,7 +55,6 @@ export async function sendRegisters(): Promise<boolean> {
             formData.append('equipamento', checklist.equipamento as string);
 
             const questoes = checklist.respostas;
-            console.log(questoes);
             if (questoes) {
                 questoes.forEach((q) => {
                     q.fotos?.forEach((foto, i) => {
@@ -94,10 +90,7 @@ export async function sendRegisters(): Promise<boolean> {
                 ));
             }
 
-            console.log(formData);
-
             const result = await sendChecklist(formData);
-            console.log({ result });
             if (result) { //Enviou com sucesso
                 console.log("Chamou deleteChecklistOffline");
                 await deleteChecklistOffline(checklist.uuid as string);
