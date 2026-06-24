@@ -8,6 +8,7 @@ import { router } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 import { updateLocalDatabase } from "../services/sync";
+import { changePassword, sendRecoverCode } from "../services/recover";
 
 export default function Login() {
     const { isConnected } = useNetInfo();
@@ -74,14 +75,13 @@ export default function Login() {
             Alert.alert("Digite o usuário para realizar a recuperação de senha.");
         }
         //TODO:
-        //const response = await recoverPassword(emailRecuperacao);
-        const response = true;
+        const response = await sendRecoverCode(emailRecuperacao);
         if (!response) {
-            Alert.alert("Falha ao recuperar senha", "Consulte o log do aplicativo para mais informações");
+            Alert.alert("Atenção", "Não foi possível enviar o código de recuperação para o seu e-mail!");
             return;
         }
         if (response) {
-            console.log("Código enviado para o e-mail");
+            Alert.alert("Sucesso!", "Código enviado para o e-mail");
             setCodeSent(true);
         }
     }
@@ -92,8 +92,7 @@ export default function Login() {
             return;
         }
         //TODO:
-        // const response = await resetPassword(codeRecover, newPassword, confirmNewPassword);
-        const response = true;
+        const response = await changePassword(emailRecuperacao, codeRecover, newPassword);
         if (response) {
             setCodeSent(false);
             setForgotPassword(false);
@@ -105,6 +104,9 @@ export default function Login() {
             } else {
                 Alert.alert("Senha alterada com sucesso!");
             }
+        }
+        else {
+            Alert.alert("Atenção", "Não foi possível concluir a mudança da senha");
         }
     }
 
@@ -180,8 +182,8 @@ export default function Login() {
                 </View>
                 : forgotPassword ?
                     <View>
-                        <Text>Digite seu usuário para recuperação de senha:</Text>
-                        <Input value={emailRecuperacao} onChangeText={setEmailRecuperacao} placeholder='Usuário' class="mt-6 mb-6" />
+                        <Text className="text-slate-700 text-lg">Informe o seu e-mail para enviarmos um código de recuperação de senha</Text>
+                        <Input value={emailRecuperacao} onChangeText={setEmailRecuperacao} placeholder='E-mail' class="mt-6 mb-6" />
 
                         <Button onPress={realizarRecuperacaoSenha}><Text className="color-slate-50 font-bold">Enviar código</Text></Button>
                         <Button onPress={cancelaForgotPassword} class="mt-6 bg-red-600"><Text className="color-slate-50 font-bold">Cancelar</Text></Button>
