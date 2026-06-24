@@ -42,3 +42,5 @@ yarn-error.*
 
 *.apk
 *.aab
+
+.env
