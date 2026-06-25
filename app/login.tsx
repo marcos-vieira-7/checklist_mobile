@@ -201,8 +201,8 @@ export default function Login() {
                     </View>
                     :
                     <View className='flex flex-col items-center'>
-                        <Input value={login} onChangeText={(text) => setLogin(text.toLowerCase())} placeholder='nome.sobrenome' class="mt-6 mb-6" />
-                        <Input value={password} onChangeText={setPassword} placeholder='Sua senha' secureTextEntry class="mb-6" />
+                        <Input value={login} onChangeText={setLogin} placeholder='nome.sobrenome' class="mt-6 mb-6" autoCapitalize="none" />
+                        <Input value={password} onChangeText={setPassword} placeholder='Sua senha' secureTextEntry class="mb-6" autoCapitalize="none" />
 
                         <Button disabled={loading} onPress={realizarLogin} class="min-w-full"><Text className="color-white font-bold text-lg">{loading ? "Conectando..." : "Acessar"}</Text></Button>
 
