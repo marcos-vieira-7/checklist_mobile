@@ -480,7 +480,7 @@ export default function FormChecklist() {
                                             {questao.exige_observacao && <Text className="text-red-600 font-medium">Observação obrigatória*</Text>}
                                         </View>
                                     )}
-                                    {questao.fotos.length > 0 || questao.videos.length > 0 &&
+                                    {(questao.fotos.length > 0 || questao.videos.length > 0) &&
                                         <View className="mt-6 flex flex-row flex-wrap gap-6">
                                             {questao.fotos.map((uri: string, indexFoto: number) => {
                                                 return (

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar } from "react-native";
+import { Alert, Text, View, Image, Pressable, ToastAndroid, Platform, StatusBar, KeyboardAvoidingView } from "react-native";
 import Input from "./components/Input";
 import Button from "./components/Button";
 import { useNetInfo } from '@react-native-community/netinfo';
@@ -21,6 +21,7 @@ export default function Login() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [keyboardOpen, setKeyboardOpen] = useState<boolean>(false);
 
     useEffect(() => {
         if (isConnected === null || isInternetReachable === null) return;
@@ -142,7 +143,7 @@ export default function Login() {
             //Salvar tokens no AsyncStorage
             await AsyncStorage.setItem("accessToken", response.accessToken);
             await AsyncStorage.setItem("refreshToken", response.refreshToken);
-            await AsyncStorage.setItem("nomeUsuario", login);
+            await AsyncStorage.setItem("nomeUsuario", login.toLowerCase());
             console.log("Atualizando banco de dados");
             // await updateDatabase({ filial, centroDeCusto, localDeEstoque, localizacao, equipamento, categoria, produto, accessToken, nomeUsuario, classificacao, funcoes });
             if (Platform.OS == 'android') {
@@ -174,7 +175,7 @@ export default function Login() {
                 // hidden
                 animated={true}
             />
-
+            <Text className="absolute top-10 right-6 text-sm text-slate-600">Versão: {Constants?.expoConfig?.version}</Text>
             <Image
                 source={require('../assets/icon.png')} // Caminho da imagem
                 className="w-36 h-36 rounded-full" // Tamanho da imagem (ajuste conforme necessário)
@@ -182,36 +183,40 @@ export default function Login() {
             />
             <Text className="text-2xl text-slate-700 font-bold mb-6">Checklists</Text>
 
-            {codeSent ?
-                <View>
-                    <Text>Informe o código recebido em seu e-mail e a nova senha:</Text>
-                    <Input value={codeRecover} onChangeText={setCodeRecover} placeholder='Código' class="mt-6 mb-6" />
-                    <Input value={newPassword} onChangeText={setNewPassword} secureTextEntry placeholder='Nova senha' class="mt-6 mb-6" />
-                    <Input value={confirmNewPassword} onChangeText={setConfirmNewPassword} secureTextEntry placeholder='Confirmação da nova senha' class="mt-6 mb-6" />
-
-                    <Button onPress={handleConfirmPassword}><Text className="color-slate-50 font-bold">Alterar Senha</Text></Button>
-                </View>
-                : forgotPassword ?
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                {codeSent ?
                     <View>
-                        <Text className="text-slate-700 text-lg">Informe o seu e-mail para enviarmos um código de recuperação de senha</Text>
-                        <Input value={emailRecuperacao} onChangeText={setEmailRecuperacao} placeholder='E-mail' class="mt-6 mb-6" />
+                        <Text>Informe o código recebido em seu e-mail e a nova senha:</Text>
+                        <Input value={codeRecover} onChangeText={setCodeRecover} placeholder='Código' class="mt-6 mb-6" />
+                        <Input value={newPassword} onChangeText={setNewPassword} secureTextEntry placeholder='Nova senha' class="mt-6 mb-6" />
+                        <Input value={confirmNewPassword} onChangeText={setConfirmNewPassword} secureTextEntry placeholder='Confirmação da nova senha' class="mt-6 mb-6" />
 
-                        <Button onPress={realizarRecuperacaoSenha}><Text className="color-slate-50 font-bold">Enviar código</Text></Button>
-                        <Button onPress={cancelaForgotPassword} class="mt-6 bg-red-600"><Text className="color-slate-50 font-bold">Cancelar</Text></Button>
+                        <Button onPress={handleConfirmPassword}><Text className="color-slate-50 font-bold">Alterar Senha</Text></Button>
                     </View>
-                    :
-                    <View className='flex flex-col items-center'>
-                        <Input value={login} onChangeText={setLogin} placeholder='nome.sobrenome' class="mt-6 mb-6" autoCapitalize="none" />
-                        <Input value={password} onChangeText={setPassword} placeholder='Sua senha' secureTextEntry class="mb-6" autoCapitalize="none" />
+                    : forgotPassword ?
+                        <View>
+                            <Text className="text-slate-700 text-lg">Informe o seu e-mail para enviarmos um código de recuperação de senha</Text>
+                            <Input value={emailRecuperacao} onChangeText={setEmailRecuperacao} placeholder='E-mail' class="mt-6 mb-6" />
 
-                        <Button disabled={loading} onPress={realizarLogin} class="min-w-full"><Text className="color-white font-bold text-lg">{loading ? "Conectando..." : "Acessar"}</Text></Button>
+                            <Button onPress={realizarRecuperacaoSenha}><Text className="color-slate-50 font-bold">Enviar código</Text></Button>
+                            <Button onPress={cancelaForgotPassword} class="mt-6 bg-red-600"><Text className="color-slate-50 font-bold">Cancelar</Text></Button>
+                        </View>
+                        :
+                        <View className='flex flex-col items-center'>
+                            <Input value={login} onChangeText={setLogin} placeholder='nome.sobrenome' class="mt-6 mb-6" autoCapitalize="none" />
+                            <Input value={password} onChangeText={setPassword} placeholder='Sua senha' secureTextEntry class="mb-6" autoCapitalize="none" />
 
-                        <Pressable onPress={handleForgotPassword}>
-                            <Text className="mt-20 color-blue-600 text-lg">Esqueceu a senha?</Text>
-                        </Pressable>
-                    </View>
-            }
-            <Text className="absolute bottom-2">Versão: {Constants?.expoConfig?.version}</Text>
+                            <Button disabled={loading} onPress={realizarLogin} class="min-w-full"><Text className="color-white font-bold text-lg">{loading ? "Conectando..." : "Acessar"}</Text></Button>
+
+                            <Pressable onPress={handleForgotPassword}>
+                                <Text className="mt-20 color-blue-600 text-lg">Esqueceu a senha?</Text>
+                            </Pressable>
+                        </View>
+                }
+            </KeyboardAvoidingView>
+
         </View>
     );
 }
