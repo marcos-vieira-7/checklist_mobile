@@ -40,8 +40,8 @@ export default function MenuCategorias() {
                 backgroundColor="#1976D2"
                 translucent={false} // 🔥 ISSO RESOLVE
             />
-            <SafeAreaView className="flex-1 bg-white">
-                <ScrollView className="flex-1 bg-white px-4">
+            <SafeAreaView className="flex-1 bg-slate-100">
+                <ScrollView className="flex-1 bg-slate-100 px-4">
                     <Text className="text-2xl font-semibold mt-6 text-slate-700">Categorias de Checklist</Text>
                     <Text className="text-md font-semibold mb-6 text-gray-400">Escolha uma categoria</Text>
 
@@ -60,7 +60,7 @@ export default function MenuCategorias() {
                                             }
                                         })
                                         }
-                                        className="bg-blue-500 rounded-lg p-6 h-32 justify-center"
+                                        className="bg-blue-500 rounded-2xl elevation-md p-6 h-32 justify-center"
                                     >
                                         <View className="text-white text-xl flex flex-row gap-2 font-bold">
                                             <MaterialIcons name="category" size={22} color="white" /><Text className="text-white font-bold text-xl">{categoria.nome}</Text>

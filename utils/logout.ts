@@ -6,6 +6,6 @@ export async function logout() {
     await AsyncStorage.removeItem('accessToken');
     await AsyncStorage.removeItem('refreshToken');
     await AsyncStorage.removeItem('nomeUsuario');
-    ToastAndroid.show("Logout realizado com sucesso!", ToastAndroid.SHORT);
+    // ToastAndroid.show("Logout realizado com sucesso!", ToastAndroid.SHORT);
     router.replace('/');
 }

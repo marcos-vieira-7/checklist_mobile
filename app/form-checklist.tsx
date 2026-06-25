@@ -354,8 +354,8 @@ export default function FormChecklist() {
                 backgroundColor="#1976D2"
                 translucent={false}
             />
-            <SafeAreaView className="flex-1 bg-white">
-                <ScrollView className="flex-1 bg-white px-4">
+            <SafeAreaView className="flex-1 bg-slate-100">
+                <ScrollView className="flex-1 bg-slate-100 px-4">
                     <Text className="text-2xl font-semibold mt-6">{nomeModelo}</Text>
                     {/* <Text className="text-md font-bold mb-6 text-gray-400">{objetivoModelo}</Text> */}
                     <Text className="text-md font-bold mb-6 text-gray-400">Preencha as informações</Text>
@@ -363,7 +363,7 @@ export default function FormChecklist() {
                     {/* Need a loading bar based number of questions asked to 100% */}
                     <View className="mb-4">
                         <Text className="text-right text-xs text-gray-500 mb-1">
-                            {Math.round((questoes.filter(q => q.resposta).length / questoes.length * 100))}
+                            {Math.round((questoes.filter(q => q.resposta).length / questoes.length * 100))}%
                         </Text>
                         <View className="w-full bg-gray-200 rounded-full h-2.5">
                             <View
@@ -381,19 +381,19 @@ export default function FormChecklist() {
                                 placeholder="Digite a localização..."
                                 value={localizacao}
                                 onChangeText={setLocalizacao}
-                                className="border border-gray-300 rounded-lg p-3 text-gray-800"
+                                className="border border-gray-300 bg-white text-lg align-top text-slate-900 rounded-2xl px-4 py-4 focus:border focus:border-blue-400"
                             />
                         </View>
 
                         {JSON.parse(exigeEquipamento?.toString()) &&
                             <View className="mb-4">
                                 <Text className="text-lg font-bold text-gray-800 mb-2">Equipamento</Text>
-                                <View className="flex flex-row items-center justify-between border border-gray-300 rounded-lg">
+                                <View className="flex flex-row items-center focus:border focus:border-blue-400 bg-white justify-between border border-gray-300 rounded-2xl">
                                     <TextInput
                                         onPress={() => setModalEquipaments(true)}
                                         placeholder="Escolha um equipamento"
                                         value={equipment}
-                                        className=" text-gray-800 px-3"
+                                        className=" text-gray-800 px-4 py-4 text-lg align-center"
                                     />
                                     <Entypo name="chevron-down" className="mr-3" size={18} color="#333" />
                                 </View>
@@ -404,7 +404,7 @@ export default function FormChecklist() {
                             return (
                                 <View
                                     key={index}
-                                    className="bg-white rounded-xl p-5 shadow-md border border-gray-200"
+                                    className="bg-white rounded-2xl p-5 shadow-md border border-gray-200"
                                 >
                                     {/* TÍTULO */}
                                     <Text className="text-lg font-bold text-gray-800 mb-4">
@@ -412,11 +412,11 @@ export default function FormChecklist() {
                                     </Text>
 
                                     {/* BOTÕES */}
-                                    <View className="flex-row justify-between gap-2 mb-3">
+                                    <View className="flex-row justify-between gap-2">
 
                                         <Pressable
                                             onPress={() => selecionarResposta(questao.id, 'C')}
-                                            className={`flex-1 py-3 rounded-lg items-center ${questao.resposta === 'C'
+                                            className={`flex-1 py-3 rounded-2xl items-center ${questao.resposta === 'C'
                                                 ? 'bg-green-600'
                                                 : 'bg-green-200'
                                                 }`}
@@ -427,7 +427,7 @@ export default function FormChecklist() {
 
                                         <Pressable
                                             onPress={() => selecionarResposta(questao.id, 'NC')}
-                                            className={`flex-1 py-3 rounded-lg items-center ${questao.resposta === 'NC'
+                                            className={`flex-1 py-3 rounded-2xl items-center ${questao.resposta === 'NC'
                                                 ? 'bg-red-600'
                                                 : 'bg-red-200'
                                                 }`}
@@ -437,7 +437,7 @@ export default function FormChecklist() {
 
                                         <Pressable
                                             onPress={() => selecionarResposta(questao.id, 'NA')}
-                                            className={`flex-1 py-3 rounded-lg items-center ${questao.resposta === 'NA'
+                                            className={`flex-1 py-3 rounded-2xl items-center ${questao.resposta === 'NA'
                                                 ? 'bg-gray-700'
                                                 : 'bg-gray-300'
                                                 }`}
@@ -480,35 +480,37 @@ export default function FormChecklist() {
                                             {questao.exige_observacao && <Text className="text-red-600 font-medium">Observação obrigatória*</Text>}
                                         </View>
                                     )}
-                                    <View className="mt-6 flex flex-row flex-wrap gap-6">
-                                        {questao.fotos.map((uri: string, indexFoto: number) => {
-                                            return (
-                                                <View key={indexFoto}>
-                                                    <Pressable onPress={() => removeFile(index, indexFoto, "foto")} className="bg-red-600 w-8 h-8 rounded-full relative top-4 flex flex-row justify-center items-center left-8 z-10 self-center border-2 border-white"><Text className="text-white">X</Text></Pressable>
-                                                    <Image className="w-28 h-28 rounded-lg" source={{ uri: uri }} key={indexFoto} />
-                                                </View>
-                                            )
-                                        })}
-                                        {questao.videos.map((uri: string, indexVideo: number) => {
-                                            return (
-                                                <View key={indexVideo}>
-                                                    <Pressable onPress={() => removeFile(index, indexVideo, "video")} className="bg-red-600 w-8 h-8 rounded-full relative  flex flex-row justify-center items-center top-0 left-0 z-10 self-center border-2 border-white"><Text className="text-white">X</Text></Pressable>
-                                                    <VideoItem
-                                                        key={uri}
-                                                        uri={uri}
-                                                    />
-                                                </View>
-                                            )
-                                        })}
-                                    </View>
+                                    {questao.fotos.length > 0 || questao.videos.length > 0 &&
+                                        <View className="mt-6 flex flex-row flex-wrap gap-6">
+                                            {questao.fotos.map((uri: string, indexFoto: number) => {
+                                                return (
+                                                    <View key={indexFoto}>
+                                                        <Pressable onPress={() => removeFile(index, indexFoto, "foto")} className="bg-red-600 w-8 h-8 rounded-full relative top-4 flex flex-row justify-center items-center left-8 z-10 self-center border-2 border-white"><Text className="text-white">X</Text></Pressable>
+                                                        <Image className="w-28 h-28 rounded-lg" source={{ uri: uri }} key={indexFoto} />
+                                                    </View>
+                                                )
+                                            })}
+                                            {questao.videos.map((uri: string, indexVideo: number) => {
+                                                return (
+                                                    <View key={indexVideo}>
+                                                        <Pressable onPress={() => removeFile(index, indexVideo, "video")} className="bg-red-600 w-8 h-8 rounded-full relative  flex flex-row justify-center items-center top-0 left-0 z-10 self-center border-2 border-white"><Text className="text-white">X</Text></Pressable>
+                                                        <VideoItem
+                                                            key={uri}
+                                                            uri={uri}
+                                                        />
+                                                    </View>
+                                                )
+                                            })}
+                                        </View>
+                                    }
                                 </View>
                             )
                         })}
                     </View>
 
                     <View className="mt-6 mb-10">
-                        <Button onPress={() => handleSubmit()} disabled={isSubmitting} class="bg-green-600">
-                            <Text className="text-white font-bold">{isSubmitting ? 'Enviando...' : 'Enviar'}</Text>
+                        <Button onPress={() => handleSubmit()} disabled={isSubmitting} class="bg-blue-600 rounded-2xl">
+                            <Text className="text-white font-bold text-lg">{isSubmitting ? 'ENVIANDO...' : 'ENVIAR'}</Text>
                         </Button>
                     </View>
                 </ScrollView>

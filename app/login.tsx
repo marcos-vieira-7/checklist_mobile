@@ -11,7 +11,7 @@ import { updateLocalDatabase } from "../services/sync";
 import { changePassword, sendRecoverCode } from "../services/recover";
 
 export default function Login() {
-    const { isConnected } = useNetInfo();
+    const { isConnected, isInternetReachable } = useNetInfo();
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
     const [emailRecuperacao, setEmailRecuperacao] = useState('');
@@ -23,18 +23,24 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        if (isConnected === null || isInternetReachable === null) return;
         checkSessionOffline();
-    }, [isConnected]);
+    }, [isConnected, isInternetReachable]);
 
     const checkSessionOffline = async () => {
         const accessToken = await AsyncStorage.getItem('accessToken');
         const refreshToken = await AsyncStorage.getItem('refreshToken');
         const nomeUsuario = await AsyncStorage.getItem('nomeUsuario');
-        if (accessToken && refreshToken && nomeUsuario && !isConnected) {
+
+        const isOffline =
+            isConnected === false &&
+            isInternetReachable === false;
+
+        if (accessToken && refreshToken && nomeUsuario && isOffline) {
             ToastAndroid.show("Restaurando sessão offline", ToastAndroid.SHORT);
             router.navigate('/menu-categorias');
         }
-    }
+    };
 
     const handleLogin = async (user: string, password: string) => {
         try {
@@ -63,7 +69,11 @@ export default function Login() {
     }
 
     const handleForgotPassword = () => {
-        setForgotPassword(true);
+        if (isConnected) {
+            setForgotPassword(true);
+            return;
+        }
+        Alert.alert("Atenção", "Você precisa estar online para redefinir a senha!");
     };
 
     const cancelaForgotPassword = () => {
@@ -158,7 +168,7 @@ export default function Login() {
     }
 
     return (
-        <View className="flex-1 w-screen p-6 justify-center items-center">
+        <View className="flex-1 w-screen bg-slate-100/80 p-6 justify-center items-center">
             <StatusBar
                 translucent={true}
                 // hidden
@@ -166,10 +176,11 @@ export default function Login() {
             />
 
             <Image
-                source={require('../assets/images/logo.png')} // Caminho da imagem
-                className="w-36 h-36 mb-5 rounded-full" // Tamanho da imagem (ajuste conforme necessário)
+                source={require('../assets/icon.png')} // Caminho da imagem
+                className="w-36 h-36 rounded-full" // Tamanho da imagem (ajuste conforme necessário)
                 resizeMode="contain" // Ajusta a imagem para caber dentro do container sem cortar
             />
+            <Text className="text-2xl text-slate-700 font-bold mb-6">Checklists</Text>
 
             {codeSent ?
                 <View>
@@ -190,13 +201,13 @@ export default function Login() {
                     </View>
                     :
                     <View className='flex flex-col items-center'>
-                        <Input value={login} onChangeText={setLogin} placeholder='nome.sobrenome' class="mt-6 mb-6" />
+                        <Input value={login} onChangeText={(text) => setLogin(text.toLowerCase())} placeholder='nome.sobrenome' class="mt-6 mb-6" />
                         <Input value={password} onChangeText={setPassword} placeholder='Sua senha' secureTextEntry class="mb-6" />
 
-                        <Button disabled={loading} onPress={realizarLogin}><Text className="color-white font-bold">{loading ? "Conectando..." : "Acessar"}</Text></Button>
+                        <Button disabled={loading} onPress={realizarLogin} class="min-w-full"><Text className="color-white font-bold text-lg">{loading ? "Conectando..." : "Acessar"}</Text></Button>
 
                         <Pressable onPress={handleForgotPassword}>
-                            <Text className="mt-20 color-blue-500">Esqueceu a senha?</Text>
+                            <Text className="mt-20 color-blue-600 text-lg">Esqueceu a senha?</Text>
                         </Pressable>
                     </View>
             }

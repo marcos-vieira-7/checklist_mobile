@@ -11,7 +11,7 @@ export default function Button(props: ButtonProps) {
     return (
         <Pressable
             onPress={props.disabled ? null : props.onPress}
-            className={`bg-blue-600 px-6 py-3 items-center rounded-lg ${props.class} ${opacity}`}
+            className={`bg-blue-600 px-6 py-4 items-center rounded-lg ${props.class} ${opacity}`}
         >
             {props.children}
         </Pressable>

@@ -76,14 +76,14 @@ export default function MenuModelos() {
                 backgroundColor="#1976D2"
                 translucent={false}
             />
-            <View className="flex-1 bg-white">
-                <View className="overflow-x-auto flex flex-row items-center">
-                    <Button onPress={() => setAbaSelecionada("novo")} class={`flex w-[50%] border border-slate-300 rounded-none ${abaSelecionada == "novo" ? "bg-[#1976D2] border-2 border-[#1976D2] font-bold" : "bg-white border-2 border-[#1976D2]"}`}><Text className={`${abaSelecionada == "novo" ? "font-medium text-white" : "font-normal"}`}>Novo Checklist</Text></Button>
-                    <Button onPress={() => setAbaSelecionada("salvos")} class={`flex w-[50%] border border-slate-300 rounded-none ${abaSelecionada == "salvos" ? "bg-[#1976D2] border-2 border-[#1976D2]" : "bg-white border-2 border-[#1976D2] font-bold"}`}><Text className={`${abaSelecionada == "salvos" ? "font-medium text-white" : "font-normal"}`}>Checklists Salvos {checklists.length > 0 ? "(" + checklists.length + ")" : ""}</Text></Button>
+            <View className="flex-1 bg-slate-100">
+                <View className="overflow-x-auto flex flex-row justify-between mx-3 items-center mt-3 pb-3">
+                    <Button onPress={() => setAbaSelecionada("novo")} class={`flex w-[49%] rounded-2xl ${abaSelecionada == "novo" ? "bg-[#1976D2] border-2 border-[#1976D2] font-bold" : "bg-white border border-[#1976d2bd] elevation-md"}`}><Text className={`${abaSelecionada == "novo" ? "font-bold text-white" : "font-medium text-slate-600"}`}>NOVO</Text></Button>
+                    <Button onPress={() => setAbaSelecionada("salvos")} class={`flex w-[49%] rounded-2xl ${abaSelecionada == "salvos" ? "bg-[#1976D2] border-2 border-[#1976D2]" : "bg-white border border-[#1976d2bd] font-bold elevation-md"}`}><Text className={`${abaSelecionada == "salvos" ? "font-bold text-white" : "font-medium text-slate-600"}`}>SALVOS {checklists.length > 0 ? "(" + checklists.length + ")" : ""}</Text></Button>
                 </View>
                 {abaSelecionada == 'novo' ?
-                    <ScrollView className="flex-1 bg-white px-4">
-                        <Text className="text-2xl font-semibold mb-0 mt-6 text-slate-700">Modelos de Checklist</Text>
+                    <ScrollView className="flex-1 bg-slate-100 px-4">
+                        <Text className="text-2xl font-semibold mb-0 mt-4 text-slate-700">Modelos de Checklist</Text>
                         <Text className="text-md font-semibold mb-6 text-gray-400">Escolha um modelo para começar a preencher</Text>
 
                         <View className="gap-4">
@@ -105,7 +105,7 @@ export default function MenuModelos() {
                                                 }
                                             })
                                             }
-                                            className="bg-blue-500 rounded-lg p-6 h-32 justify-center">
+                                            className="bg-blue-500 rounded-2xl elevation-md p-6 h-32 justify-center">
                                             <View className="text-white text-xl flex flex-row items-center font-bold gap-2">
                                                 <Feather name="check-square" size={22} color="white" /><Text className="text-xl text-white font-bold">{modeloChecklist.nome}</Text>
                                             </View>
@@ -122,8 +122,8 @@ export default function MenuModelos() {
                         </View>
                     </ScrollView>
                     :
-                    <ScrollView className="flex-1 bg-white px-4">
-                        <Text className="text-2xl font-semibold mb-0 mt-6 text-slate-700">Checklists Salvos {checklists.length > 0 ? "(" + checklists.length + ")" : ""}</Text>
+                    <ScrollView className="flex-1 bg-slate-100 px-4">
+                        <Text className="text-2xl font-semibold mt-4 text-slate-700">Checklists Salvos {checklists.length > 0 ? "(" + checklists.length + ")" : ""}</Text>
                         <Text className="text-md font-semibold mb-3 text-gray-400">Clique para editar</Text>
 
                         <View className="gap-4">
@@ -152,7 +152,7 @@ export default function MenuModelos() {
                                         }
                                     })
                                     }
-                                    className="bg-slate-100 border-l-2 border-blue-500 rounded-lg p-6 h-32 justify-center">
+                                    className="bg-slate-100 rounded-2xl elevation-md border-l-2 border-blue-500 p-6 h-32 justify-center">
                                     <View className="flex flex-row items-center justify-between">
                                         <View>
                                             <View className="text-white text-xl flex flex-row items-center font-bold gap-2">
