@@ -173,6 +173,7 @@ export default function Login() {
             <StatusBar
                 translucent={true}
                 // hidden
+                barStyle={"default"}
                 animated={true}
             />
             <Text className="absolute top-10 right-6 text-sm text-slate-600">Versão: {Constants?.expoConfig?.version}</Text>

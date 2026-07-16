@@ -11,7 +11,6 @@ import { ChecklistAnswersProps, ChecklistProps } from "../types/checklist";
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { EquipmentProps } from "../types/equipment";
 import { getEquipmentsOffline } from "../database/equipments";
-import Input from "./components/Input";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Questao = {
@@ -24,18 +23,21 @@ type Questao = {
     observacao: string,
     resposta: "C" | "NC" | "NA" | null,
     videos: string[],
-    localizacao: string
+    localizacao: string,
+    motivo: string
 }
 
 export default function FormChecklist() {
 
     const [questoes, setQuestoes] = useState<Questao[]>([]);
+    const [questaoSelecionada, setQuestaoSelecionada] = useState<Questao>();
     const { perguntasDoModelo, nomeModelo, objetivoModelo, exigeEquipamento, idObra, uuidChecklist, localizacaoChecklist, equipamentoChecklist, perguntasDomodelo } = useLocalSearchParams();
     const [localizacao, setLocalizacao] = useState(localizacaoChecklist?.toString() || '');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [equipment, setEquipment] = useState<string>(equipamentoChecklist?.toString() || "");
     const [equipments, setEquipments] = useState<EquipmentProps[]>();
     const [modalEquipaments, setModalEquipaments] = useState<boolean>(false);
+    const [modalMotivoNC, setModalMotivoNC] = useState<boolean>(false);
     const [searchEquipment, setSearchEquipment] = useState<string>("");
 
     useEffect(() => {
@@ -51,6 +53,7 @@ export default function FormChecklist() {
                 observacao: p.observacao,
                 fotos: p.fotos,
                 videos: p.videos,
+                motivo: p.motivo,
                 exige_foto: perguntasDoModeloParseado.exige_foto,
                 exige_video: perguntasDoModeloParseado.exige_video,
                 exige_observacao: perguntasDoModeloParseado.exige_observacao,
@@ -66,6 +69,7 @@ export default function FormChecklist() {
                 observacao: '',
                 fotos: [],
                 videos: [],
+                motivo: p.motivo,
                 exige_foto: p.exige_foto,
                 exige_video: p.exige_video,
                 exige_observacao: p.exige_observacao,
@@ -260,9 +264,8 @@ export default function FormChecklist() {
                     resposta: q.resposta,
                     observacao: q.observacao,
                     fotos: q.fotos,
-                    videos: q.videos
-                    // fotos: q.fotos?.map((_, i) => `${uuid}_foto_${q.id}_${i}.jpg`) || [],
-                    // videos: q.videos?.map((_, i) => `${uuid}_video_${q.id}_${i}.mp4`) || []
+                    videos: q.videos,
+                    motivo: q.motivo
                 })),
                 status: 1,
                 equipamento: equipment
@@ -292,9 +295,8 @@ export default function FormChecklist() {
                     resposta: q.resposta,
                     observacao: q.observacao,
                     fotos: q.fotos,
-                    videos: q.videos
-                    // fotos: q.fotos?.map((_, i) => `${uuid}_foto_${q.id}_${i}.jpg`) || [],
-                    // videos: q.videos?.map((_, i) => `${uuid}_video_${q.id}_${i}.mp4`) || []
+                    videos: q.videos,
+                    motivo: q.motivo
                 })),
                 status: 1,
                 equipamento: equipment
@@ -450,6 +452,19 @@ export default function FormChecklist() {
                                     {questao.resposta === 'NC' && (
                                         <View className="mt-2 gap-3">
 
+                                            <View className="">
+                                                <Text className="text-lg font-medium text-gray-800 mb-2">Motivo</Text>
+                                                <Pressable onPress={() => [setQuestaoSelecionada(questao), setModalMotivoNC(true)]} className="flex flex-row items-center focus:border focus:border-blue-400 bg-white justify-between border border-gray-300 rounded-2xl">
+                                                    <TextInput
+                                                        onPress={() => [setQuestaoSelecionada(questao), setModalMotivoNC(true)]}
+                                                        placeholder="Motivo da não conformidade"
+                                                        value={questao.motivo}
+                                                        className=" text-gray-800 px-4 py-4 text-md align-center flex flex-1"
+                                                    />
+                                                    <Entypo name="chevron-down" className="mr-3" size={18} color="#333" />
+                                                </Pressable>
+                                            </View>
+
                                             <TextInput
                                                 placeholder="Descreva o problema..."
                                                 multiline
@@ -524,7 +539,7 @@ export default function FormChecklist() {
                 <View className="bg-slate-100 flex-1">
                     <View className="flex flex-row items-center justify-between m-6 mb-10">
                         <Text className="text-lg font-medium">Escolha um equipamento abaixo</Text>
-                        <AntDesign name="close" size={18} color="black" />
+                        <AntDesign onPress={() => setModalEquipaments(false)} name="close" size={18} color="black" />
                     </View>
                     <TextInput placeholder="Procurar equipamento" className="border border-gray-400 rounded-lg p-3 mx-6 text-gray-800" value={searchEquipment} onChangeText={text => setSearchEquipment(text)} />
                     <ScrollView className="mt-6 px-6">
@@ -536,6 +551,30 @@ export default function FormChecklist() {
                             )
                         })}
                     </ScrollView>
+                </View>
+            </Modal>
+            <Modal
+                visible={modalMotivoNC}
+                onRequestClose={() => setModalMotivoNC(false)}
+                animationType="slide"
+                transparent={true}
+            >
+                <View className="bg-slate-100 flex-1">
+                    <View className="flex flex-row items-center justify-between m-6 mb-10">
+                        <Text className="text-lg font-medium">Motivo da não conformidade</Text>
+                        <AntDesign onPress={() => setModalMotivoNC(false)} name="close" size={18} color="black" />
+                    </View>
+                    <View className="flex flex-col px-6 py-2">
+                        <Pressable onPress={() => !questaoSelecionada ? null : [atualizarQuestao(questaoSelecionada.id, { motivo: 'Desvio' }), setModalMotivoNC(false)]} className="bg-slate-200 py-2 px-4 rounded-lg">
+                            <Text className="text-slate-700 font-medium text-md">Desvio</Text>
+                        </Pressable>
+                        <Pressable onPress={() => !questaoSelecionada ? null : [atualizarQuestao(questaoSelecionada.id, { motivo: 'Interdição' }), setModalMotivoNC(false)]} className="py-2 px-4 rounded-lg">
+                            <Text className="text-slate-700 font-medium text-md">Interdição</Text>
+                        </Pressable>
+                        <Pressable onPress={() => !questaoSelecionada ? null : [atualizarQuestao(questaoSelecionada.id, { motivo: 'Notificação' }), setModalMotivoNC(false)]} className="bg-slate-200 py-2 px-4 rounded-lg">
+                            <Text className="text-slate-700 font-medium text-md">Notificação</Text>
+                        </Pressable>
+                    </View>
                 </View>
             </Modal>
         </View>

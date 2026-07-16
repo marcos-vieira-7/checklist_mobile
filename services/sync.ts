@@ -85,7 +85,8 @@ export async function sendRegisters(): Promise<boolean> {
                         resposta: q.resposta,
                         observacao: q.observacao,
                         fotos: q.fotos?.map((_, i) => `${checklist.uuid}_foto_${q.id}_${i}.jpg`) || [],
-                        videos: q.videos?.map((_, i) => `${checklist.uuid}_video_${q.id}_${i}.mp4`) || []
+                        videos: q.videos?.map((_, i) => `${checklist.uuid}_video_${q.id}_${i}.mp4`) || [],
+                        motivo: q.motivo
                     }))
                 ));
             }

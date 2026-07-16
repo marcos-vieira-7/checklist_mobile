@@ -20,5 +20,6 @@ export interface ChecklistAnswersProps {
     resposta: "C" | "NC" | "NA" | null,
     observacao?: string | null,
     fotos: string[] | null,
-    videos: string[] | null
+    videos: string[] | null,
+    motivo: string
 }
