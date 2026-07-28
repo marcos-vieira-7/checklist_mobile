@@ -156,7 +156,7 @@ export default function Login() {
             console.log("Navegando para menu categorias");
             setLoading(false);
             try {
-                router.navigate('/menu-categorias');
+                router.navigate('/menu-principal');
             } catch (error) {
                 console.log("Erro ao navegar para menu categorias: " + JSON.stringify(error));
             }
