@@ -2,11 +2,13 @@ import { createOrUpdateCategoriesOffline } from "../database/categories";
 import { deleteChecklistOffline, getChecklistsOffline } from "../database/checklists";
 import { createOrUpdateEquipmentsOffline } from "../database/equipments";
 import { createOrUpdateModelsOffline } from "../database/models";
+import { createOrUpdateUsersOffline } from "../database/users";
 import { createOrUpdateWorksOffline } from "../database/works";
 import { getCategories } from "./categories";
 import { sendChecklist } from "./checklists";
 import { getEquipments } from "./equipments";
 import { getModels } from "./models";
+import { getUsers } from "./users";
 import { getAllWorks } from "./works";
 
 export async function updateLocalDatabase() {
@@ -33,6 +35,12 @@ export async function updateLocalDatabase() {
     const equipments = await getEquipments();
     if (equipments) {
         await createOrUpdateEquipmentsOffline(equipments);
+    }
+
+    //Atualizando usuarios
+    const users = await getUsers();
+    if (users) {
+        await createOrUpdateUsersOffline(users);
     }
 
 }
