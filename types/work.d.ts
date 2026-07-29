@@ -6,7 +6,7 @@ export interface WorkProps {
     filial_id?: number | undefined;
     coligada_id?: number | undefined;
     endereco?: string | undefined;
-    responsavel?: number | undefined;
+    responsavel?: string | undefined;
     status: boolean;
 }
 
