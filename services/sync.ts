@@ -2,12 +2,14 @@ import { createOrUpdateCategoriesOffline } from "../database/categories";
 import { deleteChecklistOffline, getChecklistsOffline } from "../database/checklists";
 import { createOrUpdateEquipmentsOffline } from "../database/equipments";
 import { createOrUpdateModelsOffline } from "../database/models";
+import { deleteRightRefusalOffline } from "../database/right-refusal";
 import { createOrUpdateUsersOffline } from "../database/users";
 import { createOrUpdateWorksOffline } from "../database/works";
 import { getCategories } from "./categories";
 import { sendChecklist } from "./checklists";
 import { getEquipments } from "./equipments";
 import { getModels } from "./models";
+import { sendRightRefusal } from "./right-refusal";
 import { getUsers } from "./users";
 import { getAllWorks } from "./works";
 
@@ -107,6 +109,17 @@ export async function sendRegisters(): Promise<boolean> {
             }
             return false;
         }
+    }
+    return false;
+}
+
+export async function sendRegisterRightRefusal(data: any): Promise<boolean> {
+    //below call the sendRightRefusal function from services/right-refusal.ts
+    const result = await sendRightRefusal(data);
+    if (result) {
+        console.log("Direito de recusa enviado com sucesso");
+        await deleteRightRefusalOffline();
+        return true;
     }
     return false;
 }
