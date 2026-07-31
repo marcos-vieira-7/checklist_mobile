@@ -109,8 +109,11 @@ export default function FormDireitoRecusa() {
         // abaixo montar data objeto para envio e chamar /right-refusal post
         const data = {
             supervisor: supervisor.id,
+            supervisor_nome: supervisor.nome,
             usuario: selectedEmployee.id,
+            usuario_nome: selectedEmployee.nome,
             obra: selectedWork.id,
+            obra_descricao: selectedWork.descricao,
             descricao: description
         }
 
@@ -143,11 +146,11 @@ export default function FormDireitoRecusa() {
                         <Text className="text-2xl font-semibold mt-6 text-slate-700">Formulário Direito de Recusa</Text>
 
                         <View className="gap-4">
-                            {rightRefusal && isConnected &&
+                            {/* {rightRefusal && isConnected &&
                                 <Pressable disabled={sincronizando} onPress={handleSync} className={`flex flex-row w-fit justify-end px-4 py-2 rounded-lg bg-blue-200 self-end ${sincronizando ? 'opacity-50' : 'opacity-100'}`}>
                                     {sincronizando ? <View className="flex flex-row items-center gap-3"><ActivityIndicator /><Text className="text-blue-600 font-semibold text-lg">Sincronizando...</Text></View> : <View className="mr-1 text-blue-600 font-medium text-lg flex flex-row items-center gap-1"><AntDesign name="sync" size={16} color="#2563eb" /><Text className="ml-2 text-lg text-blue-600 font-medium">Enviar Formulário</Text></View>}
                                 </Pressable>
-                            }
+                            } */}
 
                             <View className="mb-4">
                                 <Text className="text-lg font-bold text-gray-800 mb-2">Supervisor/Líder Imediato</Text>

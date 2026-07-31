@@ -36,7 +36,7 @@ export default function MenuPrincipal() {
                         <Pressable
                             key={"opcao_2"}
                             onPress={() => (router.navigate({
-                                        pathname: '/form-direito-recusa',
+                                        pathname: '/list-direito-recusa',
                                     }))}
                             className="bg-blue-500 rounded-2xl elevation-md p-6 h-32 justify-center mt-2"
                         >

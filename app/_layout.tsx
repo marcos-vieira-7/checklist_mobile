@@ -72,6 +72,17 @@ export default function RootLayout() {
             </Pressable>
           </View>
         )}} />
+        <Stack.Screen name="list-direito-recusa" options={{ title: 'Direito de Recusa', headerRight: () => (
+          <View className="flex flex-row gap-8">
+            {isConnected && <FontAwesome5 onPress={() => updateLocalDatabase().then(() => ToastAndroid.show("Atualizado com sucesso!", ToastAndroid.SHORT))} name="sync-alt" size={20} color="#fff" />}
+            <Pressable
+              onPress={logout}
+              style={{ marginRight: 10 }}
+            >
+              <Text className='text-white'>sair</Text>
+            </Pressable>
+          </View>
+        )}} />
         <Stack.Screen name="form-direito-recusa" options={{ title: 'Formulário de Direito de Recusa', headerBackVisible: false, headerRight: () => (
           <View className="flex flex-row gap-8">
             {isConnected && <FontAwesome5 onPress={() => updateLocalDatabase().then(() => ToastAndroid.show("Atualizado com sucesso!", ToastAndroid.SHORT))} name="sync-alt" size={20} color="#fff" />}
