@@ -14,6 +14,7 @@ export default function ListDireitoRecusa() {
     const [rightRefusal, setRightRefusal] = useState<RightRefusalProps | undefined>(undefined);
     const [sincronizando, setSincronizando] = useState<boolean>(false);
     const { isConnected } = useNetInfo();
+    const novoFormularioDesabilitado = Boolean(rightRefusal) || sincronizando;
 
     useEffect(() => {
         carregarRightRefusal();
@@ -71,7 +72,11 @@ export default function ListDireitoRecusa() {
                     </View>
                     
                     <View className="flex-row justify-start mb-4 ml-4">
-                        <Button onPress={() => router.navigate('/form-direito-recusa')} class="rounded-2xl px-5 py-3">
+                        <Button
+                            onPress={() => router.navigate('/form-direito-recusa')}
+                            disabled={novoFormularioDesabilitado ? true : false}
+                            class="rounded-2xl px-5 py-3"
+                        >
                             <Text className="text-white font-bold text-base">Novo Formulário</Text>
                         </Button>
                     </View>

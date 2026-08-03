@@ -25,18 +25,18 @@ export async function sendRightRefusal(data: any): Promise<boolean | undefined> 
 }
 
 
-// export async function getChecklists(): Promise<ChecklistProps[] | undefined> {
-//     try {
-//         const result = await api.get('checklist');
-//         if (result.status === 200) {
-//             return result.data;
-//         }
-//     } catch (error: any) {
-//         if (error.status == 401) {
-//             Alert.alert("Atenção", "Sessão expirada, faça login novamente!");
-//             logout();
-//         }
-//         Alert.alert("Não foi possível obter os checklists", JSON.stringify(error));
-//         console.log(error);
-//     }
-// }
+export async function getRightRefusals(): Promise<ChecklistProps[] | undefined> {
+    try {
+        const result = await api.get('right-refusal/');
+        if (result.status === 200) {
+            return result.data;
+        }
+    } catch (error: any) {
+        if (error.status == 401) {
+            Alert.alert("Atenção", "Sessão expirada, faça login novamente!");
+            logout();
+        }
+        Alert.alert("Não foi possível obter os direitos de recusa", JSON.stringify(error));
+        console.log(error);
+    }
+}

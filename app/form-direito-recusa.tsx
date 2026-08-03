@@ -122,7 +122,7 @@ export default function FormDireitoRecusa() {
         const success = await createOrUpdateRightRefusalOffline(data);
         setIsSubmitting(false);
         if (success) {
-            ToastAndroid.show("Formulário enviado com sucesso!", ToastAndroid.SHORT);
+            ToastAndroid.show("Formulário salvo!", ToastAndroid.SHORT);
             router.back();
         }
     }
