@@ -31,7 +31,7 @@ export default function FormDireitoRecusa() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { isConnected } = useNetInfo();
 
-    const [rightRefusal, setRightRefusal] = useState<RightRefusalProps >({} as RightRefusalProps);
+    const [rightRefusal, setRightRefusal] = useState<RightRefusalProps[]>([]);
     const [sincronizando, setSincronizando] = useState<boolean>(false);
 
     const filteredUsuarios = usuarios.filter((u) =>
@@ -80,7 +80,6 @@ export default function FormDireitoRecusa() {
     const obterObras = async () => {
         const result = await getWorksOffline();
         if (result) {
-            console.log("Obras obtidas com sucesso:", result);
             setObras(result);
         }
     }
@@ -88,18 +87,11 @@ export default function FormDireitoRecusa() {
     const obterUsuarios = async () => {
         const result = await getUsersOffline();
         if (result) {
-            console.log("Usuários obtidos com sucesso:", result);
             setUsuarios(result);
         }
     }
 
     const handleSubmit = async () => {
-        // Aqui você pode adicionar a lógica para enviar os dados do formulário
-        console.log("Supervisor:", supervisor.id);
-        console.log("Selected Employee:", selectedEmployee.id);
-        console.log("Selected Work:", selectedWork.id);
-        console.log("Description:", description);
-
         //verificar se todos os campos obrigatórios foram preenchidos
         if (!supervisor || !selectedEmployee || !selectedWork || !description) {
             alert("Por favor, preencha todos os campos obrigatórios.");
@@ -143,7 +135,7 @@ export default function FormDireitoRecusa() {
                 <SafeAreaView className="flex-1 bg-slate-100">
 
                     <ScrollView className="flex-1 bg-slate-100 px-4">
-                        <Text className="text-2xl font-semibold mt-6 text-slate-700">Formulário Direito de Recusa</Text>
+                        <Text className="text-2xl font-semibold text-slate-700 mb-6">Formulário Direito de Recusa</Text>
 
                         <View className="gap-4">
                             {/* {rightRefusal && isConnected &&
@@ -162,17 +154,17 @@ export default function FormDireitoRecusa() {
                                 </Pressable>
                             </View>
 
-                        <View className="mb-4">
-                            <Text className="text-lg font-bold text-gray-800 mb-2">Obra do Empregado</Text>
-                            <Pressable onPress={() => setModalWork(true)} className="flex flex-row items-center bg-white justify-between border border-gray-300 rounded-2xl">
-                                <Text className={`text-gray-800 px-4 py-4 text-lg ${selectedWork ? '' : 'text-gray-400'}`}>
-                                    {selectedWork?.descricao || 'Escolha uma obra'}
-                                </Text>
-                                <Entypo name="chevron-down" className="mr-3" size={18} color="#333" />
-                            </Pressable>
-                        </View>
+                            <View className="mb-4">
+                                <Text className="text-lg font-bold text-gray-800 mb-2">Obra do Empregado</Text>
+                                <Pressable onPress={() => setModalWork(true)} className="flex flex-row items-center bg-white justify-between border border-gray-300 rounded-2xl">
+                                    <Text className={`text-gray-800 px-4 py-4 text-lg ${selectedWork ? '' : 'text-gray-400'}`}>
+                                        {selectedWork?.descricao || 'Escolha uma obra'}
+                                    </Text>
+                                    <Entypo name="chevron-down" className="mr-3" size={18} color="#333" />
+                                </Pressable>
+                            </View>
 
-                    {/*     <View className="mb-4">
+                            {/*     <View className="mb-4">
                             <Text className="text-lg font-bold text-gray-800 mb-2">Gestor do Contrato</Text>
                             <TextInput
                                 placeholder="Gestor do contrato"
@@ -183,17 +175,17 @@ export default function FormDireitoRecusa() {
                         </View> 
                     */}
 
-                        <View className="mb-4">
-                            <Text className="text-lg font-bold text-gray-800 mb-2">Nome do Empregado</Text>
-                            <Pressable onPress={() => setModalEmployee(true)} className="flex flex-row items-center bg-white justify-between border border-gray-300 rounded-2xl">
-                                <Text className={`text-gray-800 px-4 py-4 text-lg ${selectedEmployee ? '' : 'text-gray-400'}`}>
-                                    {selectedEmployee?.nome || 'Escolha um empregado'}
-                                </Text>
-                                <Entypo name="chevron-down" className="mr-3" size={18} color="#333" />
-                            </Pressable>
-                        </View>
+                            <View className="mb-4">
+                                <Text className="text-lg font-bold text-gray-800 mb-2">Nome do Empregado</Text>
+                                <Pressable onPress={() => setModalEmployee(true)} className="flex flex-row items-center bg-white justify-between border border-gray-300 rounded-2xl">
+                                    <Text className={`text-gray-800 px-4 py-4 text-lg ${selectedEmployee ? '' : 'text-gray-400'}`}>
+                                        {selectedEmployee?.nome || 'Escolha um empregado'}
+                                    </Text>
+                                    <Entypo name="chevron-down" className="mr-3" size={18} color="#333" />
+                                </Pressable>
+                            </View>
 
-                        {/* <View className="mb-4">
+                            {/* <View className="mb-4">
                             <Text className="text-lg font-bold text-gray-800 mb-2">Matrícula do Empregado</Text>
                             <TextInput
                                 placeholder="Matrícula"
@@ -203,22 +195,22 @@ export default function FormDireitoRecusa() {
                             />
                         </View> */}
 
-                        <View className="mb-4">
-                            <Text className="text-lg font-bold text-gray-800 mb-2">Descrição da Condição Observada</Text>
-                            <TextInput
-                                placeholder="Descreva a condição observada"
-                                value={description}
-                                onChangeText={setDescription}
-                                multiline={true}
-                                numberOfLines={4}
-                                className="bg-white border border-gray-300 rounded-2xl px-4 py-4 text-gray-800 text-lg h-32 text-start"
-                            />
-                        </View>
+                            <View className="mb-4">
+                                <Text className="text-lg font-bold text-gray-800 mb-2">Descrição da Condição Observada</Text>
+                                <TextInput
+                                    placeholder="Descreva a condição observada"
+                                    value={description}
+                                    onChangeText={setDescription}
+                                    multiline={true}
+                                    numberOfLines={4}
+                                    className="bg-white border align-top border-gray-300 rounded-2xl px-4 py-4 text-gray-800 text-lg h-32 text-start"
+                                />
+                            </View>
 
-                        <Pressable onPress={handleSubmit} className="bg-blue-600 rounded-2xl py-4 items-center justify-center mt-2 mb-6">
-                            <Text className="text-white text-lg font-bold">Enviar</Text>
-                        </Pressable>
-                    </View>
+                            <Pressable onPress={handleSubmit} className="bg-blue-600 rounded-2xl py-4 items-center justify-center mt-2 mb-6">
+                                <Text className="text-white text-lg font-bold">Enviar</Text>
+                            </Pressable>
+                        </View>
                     </ScrollView>
                 </SafeAreaView>
 

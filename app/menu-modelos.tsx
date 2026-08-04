@@ -86,7 +86,7 @@ export default function MenuModelos() {
                         <Text className="text-2xl font-semibold mb-0 mt-4 text-slate-700">Modelos de Checklist</Text>
                         <Text className="text-md font-semibold mb-6 text-gray-400">Escolha um modelo para começar a preencher</Text>
 
-                        <View className="gap-4">
+                        <View className="gap-4 mb-14">
                             <Input value={busca} onChangeText={(text) => setBusca(text)} placeholder="Procurar modelos de checklist..." />
                             {modelos.map((modeloChecklist: ModelProps) => {
                                 if (modeloChecklist?.nome?.toLowerCase().includes(busca?.toLowerCase())) {
@@ -107,7 +107,7 @@ export default function MenuModelos() {
                                             }
                                             className="bg-blue-500 rounded-2xl elevation-md p-6 h-32 justify-center">
                                             <View className="text-white text-xl flex flex-row items-center font-bold gap-2">
-                                                <Feather name="check-square" size={22} color="white" /><Text className="text-xl text-white font-bold">{modeloChecklist.nome}</Text>
+                                                <AntDesign name="check-square" size={22} color="white" /><Text className="text-xl text-white font-bold">{modeloChecklist.nome}</Text>
                                             </View>
                                             <View className="text-blue-100 flex flex-row text-sm mt-2">
                                                 <Text className="text-white font-bold">Versão: </Text><Text className="text-blue-100">{modeloChecklist.versao}</Text>
@@ -126,7 +126,7 @@ export default function MenuModelos() {
                         <Text className="text-2xl font-semibold mt-4 text-slate-700">Checklists Salvos {checklists.length > 0 ? "(" + checklists.length + ")" : ""}</Text>
                         <Text className="text-md font-semibold mb-3 text-gray-400">Clique para editar</Text>
 
-                        <View className="gap-4">
+                        <View className="gap-4 mb-14">
                             {/* <Input value={busca} onChangeText={(text) => setBusca(text)} placeholder="Procurar modelos de checklist..." /> */}
                             {checklists.length > 0 && isConnected &&
                                 <Pressable disabled={sincronizando} onPress={handleSync} className={`flex flex-row w-fit justify-end px-4 py-2 rounded-lg bg-blue-200 self-end ${sincronizando ? 'opacity-50' : 'opacity-100'}`}>
@@ -156,7 +156,7 @@ export default function MenuModelos() {
                                     <View className="flex flex-row items-center justify-between">
                                         <View>
                                             <View className="text-white text-xl flex flex-row items-center font-bold gap-2">
-                                                <Feather name="check-square" size={22} color="#333" /><Text className="text-xl text-slate-800 font-bold">{checklist.modelo}</Text>
+                                                <AntDesign name="check-square" size={22} color="#333" /><Text className="text-xl text-slate-800 font-bold">{checklist.modelo}</Text>
                                             </View>
                                             <View className="text-blue-100 flex flex-row text-sm mt-2">
                                                 <Text className="text-slate-800 font-bold">Localização: </Text><Text className="text-slate-800">{checklist.localizacao}</Text>

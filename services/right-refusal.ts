@@ -3,7 +3,6 @@ import api from "./api";
 import { ChecklistProps } from "../types/checklist";
 import { logout } from "../utils/logout";
 
-
 export async function sendRightRefusal(data: any): Promise<boolean | undefined> {
     try {
         await api.post('right-refusal/', data, {
@@ -23,7 +22,6 @@ export async function sendRightRefusal(data: any): Promise<boolean | undefined> 
         console.log(error);
     }
 }
-
 
 export async function getRightRefusals(): Promise<ChecklistProps[] | undefined> {
     try {

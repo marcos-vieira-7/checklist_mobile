@@ -42,7 +42,7 @@ export default function MenuCategorias() {
             />
             <SafeAreaView className="flex-1 bg-slate-100">
                 <ScrollView className="flex-1 bg-slate-100 px-4">
-                    <Text className="text-2xl font-semibold mt-6 text-slate-700">Categorias de Checklist</Text>
+                    <Text className="text-2xl font-semibold text-slate-700">Categorias de Checklist</Text>
                     <Text className="text-md font-semibold mb-6 text-gray-400">Escolha uma categoria</Text>
 
                     <View className="gap-4">
