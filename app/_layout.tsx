@@ -17,8 +17,8 @@ export default function RootLayout() {
 
       <StatusBar
         style="light"
-        backgroundColor="#1976D2"
-        translucent={false}
+        // backgroundColor="#1976D2"
+        // translucent={false}
       />
       <Stack
         screenOptions={{
