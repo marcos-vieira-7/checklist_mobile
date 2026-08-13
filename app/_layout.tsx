@@ -136,6 +136,34 @@ export default function RootLayout() {
           )
         }} />
 
+        <Stack.Screen name="form-condicao-insegura" options={{
+          title: 'Condição Insegura', headerRight: () => (
+            <View className="flex flex-row gap-8">
+              {isConnected && <FontAwesome5 onPress={() => updateLocalDatabase().then(() => ToastAndroid.show("Atualizado com sucesso!", ToastAndroid.SHORT))} name="sync-alt" size={20} color="#fff" />}
+              <Pressable
+                onPress={logout}
+                style={{ marginRight: 10 }}
+              >
+                <Text className='text-white'>sair</Text>
+              </Pressable>
+            </View>
+          )
+        }} />
+
+        <Stack.Screen name="list-condicao-insegura" options={{
+          title: 'Condição Insegura', headerRight: () => (
+            <View className="flex flex-row gap-8">
+              {isConnected && <FontAwesome5 onPress={() => updateLocalDatabase().then(() => ToastAndroid.show("Atualizado com sucesso!", ToastAndroid.SHORT))} name="sync-alt" size={20} color="#fff" />}
+              <Pressable
+                onPress={logout}
+                style={{ marginRight: 10 }}
+              >
+                <Text className='text-white'>sair</Text>
+              </Pressable>
+            </View>
+          )
+        }} />
+
       </Stack>
     </SafeAreaProvider>
   );

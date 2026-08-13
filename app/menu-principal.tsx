@@ -59,6 +59,22 @@ export default function MenuPrincipal() {
                                 <Text className="font-bold text-white">Descrição:</Text> Preenchimento do formulário de direito de recusa
                             </Text>
                         </Pressable>
+
+                        <Pressable
+                            key={"opcao_4"}
+                            onPress={() => (router.navigate({
+                                pathname: '/list-condicao-insegura',
+                            }))}
+                            className="bg-blue-500 rounded-2xl elevation-md p-6 h-32 justify-center mt-2"
+                        >
+                            <View className="text-white text-xl flex flex-row gap-3 font-bold">
+                                <Entypo name="book" size={22} color="white" /><Text className="text-white font-bold text-xl">Condição Insegura</Text>
+                            </View>
+                            <Text className="text-blue-100 text-sm mt-2">
+                                <Text className="font-bold text-white">Descrição:</Text> Preenchimento do formulário de Condições Inseguras
+                            </Text>
+                        </Pressable>
+
                     </View>
                 </ScrollView>
             </SafeAreaView>

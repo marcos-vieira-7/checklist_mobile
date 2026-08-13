@@ -144,6 +144,7 @@ export default function Login() {
             await AsyncStorage.setItem("accessToken", response.accessToken);
             await AsyncStorage.setItem("refreshToken", response.refreshToken);
             await AsyncStorage.setItem("nomeUsuario", login.toLowerCase());
+            await AsyncStorage.setItem("usuarioID", response?.user?.id.toString() || "");
             console.log("Atualizando banco de dados");
             // await updateDatabase({ filial, centroDeCusto, localDeEstoque, localizacao, equipamento, categoria, produto, accessToken, nomeUsuario, classificacao, funcoes });
             if (Platform.OS == 'android') {
