@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { ScrollView, StatusBar, View, Text, Pressable, ToastAndroid, ActivityIndicator, Alert } from "react-native";
+import { ScrollView, StatusBar, View, Text, Pressable, ToastAndroid, ActivityIndicator, Alert, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useFocusEffect } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -14,8 +14,6 @@ export default function ListCondicaoInsegura() {
     const [unsafeConditions, setUnsafeConditions] = useState<UnsafeConditionProps[]>([]);
     const [sincronizando, setSincronizando] = useState<boolean>(false);
     const { isConnected } = useNetInfo();
-    const novoFormularioDesabilitado = unsafeConditions.length > 0 || sincronizando;
-
 
     useFocusEffect(
         useCallback(() => {
@@ -51,7 +49,6 @@ export default function ListCondicaoInsegura() {
 
     const handleSync = async () => {
         // Sincronizando os formulários salvos localmente com o servidor.
-        console.log("Sincronizar teste.");
         if (unsafeConditions.length === 0) return;
 
         setSincronizando(true);
@@ -121,7 +118,7 @@ export default function ListCondicaoInsegura() {
                                                 unsafeCondition: JSON.stringify(item)
                                             }
                                         })}
-                                    key={item.uuid || `${index}-${item.responsavel}`}
+                                        key={item.uuid || `${index}-${item.responsavel}`}
                                         className="elevation-md bg-white rounded-xl p-6"
                                     >
                                         <Text className="text-base font-semibold text-slate-700">Formulário {index + 1}</Text>
@@ -141,6 +138,18 @@ export default function ListCondicaoInsegura() {
                                             <Text className="text-slate-600 font-semibold">Descrição</Text>
                                             <Text className="text-slate-800">{item.descricao}</Text>
                                         </View>
+                                        {
+                                            item.fotos && item.fotos?.length > 0 && (
+                                                <View className="mb-2 mt-2">
+                                                    <Text className="text-slate-600 font-semibold">Fotos</Text>
+                                                    <View className="mt-2 flex-row flex-wrap gap-2">
+                                                        {item.fotos.map((photo, photoIndex) => (
+                                                            <Image key={`${photo.uri}-${photoIndex}`} source={{ uri: photo.uri }} className="h-16 w-16 rounded-lg" />
+                                                        ))}
+                                                    </View>
+                                                </View>
+                                            )
+                                        }
                                     </Pressable>
                                 ))}
                             </View>

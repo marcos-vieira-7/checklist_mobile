@@ -83,6 +83,8 @@ export default function FormReportCliente() {
         setSafetyTechnician(usuarios.find(u => u.id == data.tecnico_seguranca_responsavel));
         setObservations(data.observacoes || "");
         setPhotos(data.fotos || []);
+
+        console.log(data.fotos);
     }
 
     const obterObras = async () => {
@@ -117,7 +119,7 @@ export default function FormReportCliente() {
                     }
 
                     const result = await ImagePicker.launchImageLibraryAsync({
-                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        mediaTypes: "images",
                         allowsMultipleSelection: true,
                         selectionLimit: remaining,
                         quality: 0.7,
@@ -144,7 +146,7 @@ export default function FormReportCliente() {
                     }
 
                     const result = await ImagePicker.launchCameraAsync({
-                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        mediaTypes: "images",
                         quality: 0.7,
                     });
 

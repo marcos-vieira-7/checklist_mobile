@@ -1,8 +1,32 @@
 
 import { createAndUpdateData, deleteData, readData } from ".";
+import { ReportClientePhoto } from "../types/report-cliente";
 import { UnsafeConditionProps } from "../types/unsafe-condition";
 
 const key = 'unsafe_condition';
+
+function normalizePhotos(fotos: unknown): ReportClientePhoto[] {
+    if (!Array.isArray(fotos)) {
+        return [];
+    }
+
+    return fotos.map((foto) => {
+        if (typeof foto === 'string') {
+            return { uri: foto };
+        }
+
+        if (foto && typeof foto === 'object') {
+            const item = foto as Record<string, unknown>;
+            return {
+                uri: typeof item.uri === 'string' ? item.uri : '',
+                name: typeof item.name === 'string' ? item.name : undefined,
+                type: typeof item.type === 'string' ? item.type : undefined,
+            };
+        }
+
+        return { uri: '' };
+    }).filter((foto) => foto.uri);
+}
 
 function parseUnsafeConditions(value: string | null | undefined): UnsafeConditionProps[] {
     /* essa funcao é usada para garantir que o valor lido do armazenamento local seja sempre um
@@ -32,11 +56,17 @@ export async function createOrUpdateUnsafeConditionOffline(unsafe_condition: Uns
     const currentItems = parseUnsafeConditions(existing);
     const itemToSave = {
         ...unsafe_condition,
-        uuid: unsafe_condition.uuid || `unsafe_condition-${Date.now()}-${currentItems.length + 1}`,
+        fotos: normalizePhotos(unsafe_condition.fotos),
+        uuid: unsafe_condition.uuid || `unsafe-condition-${Date.now()}-${currentItems.length + 1}`,
     };
 
-    currentItems.push(itemToSave);
-    const result = await createAndUpdateData(key, JSON.stringify(currentItems));
+    const existingIndex = currentItems.findIndex((item) => item.uuid === itemToSave.uuid);
+
+    const updatedItems = existingIndex >= 0
+        ? currentItems.map((item, index) => index === existingIndex ? itemToSave : item)
+        : [...currentItems, itemToSave];
+
+    const result = await createAndUpdateData(key, JSON.stringify(updatedItems));
     return result;
 }
 

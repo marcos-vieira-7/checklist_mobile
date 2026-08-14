@@ -8,14 +8,14 @@ import { UnsafeConditionProps, UnsafeConditionPhoto } from "../types/unsafe-cond
 import { createOrUpdateUnsafeConditionOffline } from "../database/unsafe-condition";
 import { router, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, { DateTimePickerChangeEvent, DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { UserProps } from "../types/user";
 
 export default function FormCondicaoInsegura() {
 
-
     const { uuid, unsafeCondition } = useLocalSearchParams();
-    const [usuarios, setUsuarios] = useState<any[]>([]);
-    const [selectedWitness, setSelectedWitness] = useState<any>(undefined);
+    const [usuarios, setUsuarios] = useState<UserProps[]>([]);
+    const [selectedWitness, setSelectedWitness] = useState<UserProps>();
     const [searchWitness, setSearchWitness] = useState<string>("");
     const [modalWitness, setModalWitness] = useState<boolean>(false);
     const [local, setLocal] = useState<string>("");
@@ -23,6 +23,7 @@ export default function FormCondicaoInsegura() {
     const [showPicker, setShowPicker] = useState(false);
     const [description, setDescription] = useState<string>("");
     const [photos, setPhotos] = useState<UnsafeConditionPhoto[]>([]);
+    const [pickerMode, setPickerMode] = useState<'date' | 'time'>('date');
 
     useEffect(() => {
         obterUsuarios();
@@ -52,14 +53,16 @@ export default function FormCondicaoInsegura() {
         if (!unsafeCondition) {
             return;
         }
-        const data: any = JSON.parse(unsafeCondition.toString());
-        console.log("Obter Dados form traz isso: ", data);
+        const data: UnsafeConditionProps = JSON.parse(unsafeCondition.toString());
 
         setSelectedWitness(usuarios.find(o => o.id == data.testemunha));
-        setLocal(data.local);
-        setDateTime(data.datetime);
-        setDescription(data.descricao)
-        setPhotos(Array.isArray(data.fotos) ? data.fotos : []);
+        setLocal(data.local || "");
+
+        // ✅ Sempre reconstrua um Date de verdade a partir da string salva
+        setDateTime(data.datetime ? new Date(data.datetime) : new Date());
+
+        setDescription(data.descricao || "")
+        setPhotos(data.fotos || []);
     }
 
     const obterUsuarios = async () => {
@@ -72,7 +75,6 @@ export default function FormCondicaoInsegura() {
     const filteredWitnesses = usuarios.filter((u) =>
         u.nome?.toLowerCase().includes(searchWitness.toLowerCase())
     );
-
 
     const handleAddPhoto = async () => {
         const remaining = 5 - photos.length;
@@ -92,7 +94,7 @@ export default function FormCondicaoInsegura() {
                     }
 
                     const result = await ImagePicker.launchImageLibraryAsync({
-                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        mediaTypes: 'images',
                         allowsMultipleSelection: true,
                         selectionLimit: remaining,
                         quality: 0.7,
@@ -105,7 +107,7 @@ export default function FormCondicaoInsegura() {
                             type: asset.mimeType || "image/jpeg",
                         }));
 
-                        setPhotos((prev:any) => [...prev, ...newPhotos].slice(0, 5));
+                        setPhotos((prev) => [...prev, ...newPhotos].slice(0, 5));
                     }
                 }
             },
@@ -119,7 +121,7 @@ export default function FormCondicaoInsegura() {
                     }
 
                     const result = await ImagePicker.launchCameraAsync({
-                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        mediaTypes: "images",
                         quality: 0.7,
                     });
 
@@ -130,7 +132,7 @@ export default function FormCondicaoInsegura() {
                             type: asset.mimeType || "image/jpeg",
                         }));
 
-                        setPhotos((prev:any) => [...prev, ...newPhotos].slice(0, 5));
+                        setPhotos((prev) => [...prev, ...newPhotos].slice(0, 5));
                     }
                 }
             },
@@ -142,64 +144,10 @@ export default function FormCondicaoInsegura() {
     };
 
     const handleRemovePhoto = (index: number) => {
-        setPhotos((prev:any) => prev.filter((_:any, photoIndex:any) => photoIndex !== index));
+        setPhotos((prev) => prev.filter((_, photoIndex) => photoIndex !== index));
     };
 
-
-    // const handleAddPhoto = async () => {
-    //     Alert.alert('Adicionar foto', 'Escolha a origem', [
-    //         {
-    //             text: 'Câmera',
-    //             onPress: async () => {
-    //                 const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    //                 if (status !== 'granted') {
-    //                     Alert.alert('Permissão necessária', 'Permissão da câmera é necessária para tirar fotos.');
-    //                     return;
-    //                 }
-
-    //                 const result = await ImagePicker.launchCameraAsync({
-    //                     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    //                     quality: 0.5,
-    //                 });
-
-    //                 if (!result.canceled) {
-    //                     setPhotos((prev) => [...prev, ...result.assets.map((asset) => asset.uri)]);
-    //                 }
-    //             }
-    //         },
-    //         {
-    //             text: 'Galeria',
-    //             onPress: async () => {
-    //                 const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    //                 if (status !== 'granted') {
-    //                     Alert.alert('Permissão necessária', 'Permissão da galeria é necessária para selecionar fotos.');
-    //                     return;
-    //                 }
-
-    //                 const result = await ImagePicker.launchImageLibraryAsync({
-    //                     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    //                     allowsMultipleSelection: false,
-    //                     quality: 0.5,
-    //                 });
-
-    //                 if (!result.canceled) {
-    //                     setPhotos((prev) => [...prev, ...result.assets.map((asset) => asset.uri)]);
-    //                 }
-    //             }
-    //         },
-    //         {
-    //             text: 'Cancelar',
-    //             style: 'cancel'
-    //         }
-    //     ]);
-    // }
-
-    // const handleRemovePhoto = (index: number) => {
-    //     setPhotos((prev) => prev.filter((_, i) => i !== index));
-    // }
-
-    const handleSubmit = async() => {
-
+    const handleSubmit = async () => {
         let usuarioID = await AsyncStorage.getItem("usuarioID") || undefined;
 
         if (!selectedWitness || !local || !dateTime || !description) {
@@ -208,36 +156,53 @@ export default function FormCondicaoInsegura() {
         }
 
         const payload: UnsafeConditionProps = {
-            // responsavel: selectedWitness.id,
             uuid: typeof uuid === "string" && uuid ? uuid : `condicao-insegura-${Date.now()}`,
             responsavel: usuarioID,
             testemunha: selectedWitness.id,
             testemunha_nome: selectedWitness.nome,
-            datetime: dateTime,
+            // ✅ Envie sempre como string ISO (UTC) — nunca o objeto Date cru
+            datetime: dateTime.toISOString(),
             local: local,
             descricao: description,
             fotos: photos,
         };
 
-        console.log('Condição insegura', {
-                    testemunha: selectedWitness,
-                    local,
-                    dateTime,
-                    description,
-                    photos,
-                    payload,
-        });
         const success = await createOrUpdateUnsafeConditionOffline(payload);
 
-        if (success){
+        if (success) {
             ToastAndroid.show('Condição insegura salva localmente.', ToastAndroid.SHORT);
             router.back();
             return;
         }
-        
+
         Alert.alert("Erro", "Não foi possível salvar o formulário offline.");
-        
+
     }
+
+    const onChangeDatetimePicker = (event: DateTimePickerChangeEvent, selectedDate: Date) => {
+        if (Platform.OS === 'android') {
+            setShowPicker(false);
+
+            // selectedDate agora sempre vem preenchido quando o usuário confirma
+            setDateTime(selectedDate);
+
+            if (pickerMode === 'date') {
+                setPickerMode('time');
+                setShowPicker(true);
+            } else {
+                setPickerMode('date');
+            }
+        } else {
+            // iOS
+            setDateTime(selectedDate);
+        }
+    };
+
+    const onDismissDatetimePicker = () => {
+        // substitui o antigo `if (event.type === 'dismissed')`
+        setShowPicker(false);
+        setPickerMode('date');
+    };
 
     return (
         <KeyboardAvoidingView
@@ -280,30 +245,27 @@ export default function FormCondicaoInsegura() {
                                     className="bg-white border border-gray-300 rounded-2xl px-4 py-4"
                                 >
                                     <Text className="text-gray-800 text-lg">
-                                        {dateTime.toLocaleString("pt-BR")}
+                                        {dateTime.toLocaleString("pt-BR", {
+                                            timeZone: "America/Sao_Paulo",
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                            year: "numeric",
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                        })}
                                     </Text>
                                 </Pressable>
 
                                 {showPicker && (
                                     <DateTimePicker
                                         value={dateTime}
-                                        mode="datetime"
-                                        onChange={(event, selectedDate) => {
-                                            setShowPicker(false);
-
-                                            if (selectedDate) {
-                                                setDateTime(selectedDate);
-                                            }
-                                        }}
+                                        mode={Platform.OS === 'android' ? pickerMode : 'datetime'}
+                                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                        timeZoneName="America/Sao_Paulo"
+                                        onValueChange={onChangeDatetimePicker}
+                                        onDismiss={onDismissDatetimePicker}
                                     />
                                 )}
-
-                                {/* <TextInput
-                                    placeholder="DD/MM/AAAA HH:MM"
-                                    value={dateTime}
-                                    onChangeText={setDateTime}
-                                    className="bg-white border border-gray-300 rounded-2xl px-4 py-4 text-gray-800 text-lg"
-                                /> */}
                                 <Text className="text-sm text-gray-500 mt-2">Use o formato brasileiro para data e hora.</Text>
                             </View>
 
@@ -315,7 +277,7 @@ export default function FormCondicaoInsegura() {
                                     onChangeText={setDescription}
                                     multiline
                                     numberOfLines={5}
-                                    className="bg-white border border-gray-300 rounded-2xl px-4 py-4 text-gray-800 text-lg h-32 text-start"
+                                    className="bg-white align-top border justify-start border-gray-300 rounded-2xl px-4 py-4 text-gray-800 text-lg h-32 text-start"
                                 />
                             </View>
 
@@ -327,14 +289,16 @@ export default function FormCondicaoInsegura() {
                                     </Pressable>
                                 </View>
                                 <View className="flex-row flex-wrap gap-3">
-                                    {photos.map((photo, index) => (
+                                    {photos.map((photo, index) => {
+                                        return (
                                             <View key={`${photo.uri}-${index}`} className="relative">
                                                 <Image source={{ uri: photo.uri }} className="h-20 w-20 rounded-xl" />
                                                 <Pressable onPress={() => handleRemovePhoto(index)} className="absolute -right-1 -top-1 bg-white rounded-full">
                                                     <AntDesign name="close" size={16} color="#ef4444" />
                                                 </Pressable>
                                             </View>
-                                    ))}
+                                        )
+                                    })}
                                 </View>
                             </View>
 
