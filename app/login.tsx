@@ -24,8 +24,9 @@ export default function Login() {
     const [keyboardOpen, setKeyboardOpen] = useState<boolean>(false);
 
     useEffect(() => {
-        if (isConnected === null || isInternetReachable === null) return;
-        checkSessionOffline();
+        if (isConnected === false || isInternetReachable === false) {
+            checkSessionOffline();
+        }
     }, [isConnected, isInternetReachable]);
 
     const checkSessionOffline = async () => {
@@ -33,12 +34,14 @@ export default function Login() {
         const refreshToken = await AsyncStorage.getItem('refreshToken');
         const nomeUsuario = await AsyncStorage.getItem('nomeUsuario');
 
-        const isOffline =
-            isConnected === false &&
-            isInternetReachable === false;
+        const isOffline = (isConnected === false || isInternetReachable === false);
 
         if (accessToken && refreshToken && nomeUsuario && isOffline) {
-            ToastAndroid.show("Restaurando sessão offline", ToastAndroid.SHORT);
+            ToastAndroid.show(
+                "Restaurando sessão offline",
+                ToastAndroid.SHORT
+            );
+
             router.navigate('/menu-categorias');
         }
     };
