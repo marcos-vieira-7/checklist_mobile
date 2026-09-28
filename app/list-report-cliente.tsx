@@ -37,7 +37,7 @@ export default function ListReportCliente() {
     const handleDelete = async () => {
         const result = await deleteReportClientOffline();
         if (result) {
-            ToastAndroid.show("Report cliente excluído com sucesso!", ToastAndroid.SHORT);
+            ToastAndroid.show("Interdição/Notificação excluída com sucesso!", ToastAndroid.SHORT);
             carregarReportClient();
             return;
         }
@@ -109,7 +109,7 @@ export default function ListReportCliente() {
                 <ScrollView className="flex-1 bg-slate-100 px-4">
                     <View className="flex-row justify-between items-center mb-4">
                         <View>
-                            <Text className="text-2xl font-semibold text-slate-700">Report Cliente</Text>
+                            <Text className="text-2xl font-semibold text-slate-700">Interdição/Notificação</Text>
                             <Text className="text-sm text-slate-500">Visualize o formulário salvo ou crie um novo.</Text>
                         </View>
                     </View>
@@ -193,7 +193,7 @@ export default function ListReportCliente() {
                     {reportClientes.length == 0 &&
                         <View className="flex flex-col justify-center items-center mt-10">
                             <Text className="text-slate-600 font-semibold">Nenhum formulário salvo localmente.</Text>
-                            <Text className="text-slate-500 mt-2 text-sm">Toque em "Novo formulário" para preencher um report de cliente.</Text>
+                            <Text className="text-slate-500 mt-2 text-sm">Toque em "Novo formulário" para preencher uma nova interdição/notificação.</Text>
                         </View>
                     }
                 </ScrollView >

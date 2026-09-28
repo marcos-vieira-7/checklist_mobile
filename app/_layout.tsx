@@ -109,7 +109,7 @@ export default function RootLayout() {
         }} />
 
         <Stack.Screen name="list-report-cliente" options={{
-          title: 'Report Cliente', headerRight: () => (
+          title: 'Interdição/Notificação', headerRight: () => (
             <View className="flex flex-row gap-8">
               {isConnected && <FontAwesome5 onPress={() => updateLocalDatabase().then(() => ToastAndroid.show("Atualizado com sucesso!", ToastAndroid.SHORT))} name="sync-alt" size={20} color="#fff" />}
               <Pressable

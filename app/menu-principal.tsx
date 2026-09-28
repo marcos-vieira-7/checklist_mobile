@@ -38,10 +38,10 @@ export default function MenuPrincipal() {
                             className="bg-blue-500 rounded-2xl elevation-md p-6 h-32 justify-center mt-2"
                         >
                             <View className="text-white text-xl flex flex-row gap-3 font-bold">
-                                <Octicons name="report" size={22} color="white" /><Text className="text-white font-bold text-xl">Report Cliente</Text>
+                                <Octicons name="report" size={22} color="white" /><Text className="text-white font-bold text-xl">Notificação/Interdição</Text>
                             </View>
                             <Text className="text-blue-100 text-sm mt-2">
-                                <Text className="font-bold text-white">Descrição:</Text> Preenchimento do formulário de report do cliente
+                                <Text className="font-bold text-white">Descrição:</Text> Report de Interdições e Notificações
                             </Text>
                         </Pressable>
 

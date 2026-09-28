@@ -218,7 +218,7 @@ export default function FormReportCliente() {
                 <SafeAreaView className="flex-1 bg-slate-100">
 
                     <ScrollView className="flex-1 bg-slate-100 px-4">
-                        <Text className="text-2xl font-semibold text-slate-700">Formulário Report do Cliente</Text>
+                        <Text className="text-2xl font-semibold text-slate-700">Formulário de Interdição e Notificação</Text>
 
                         <View className="gap-4">
 

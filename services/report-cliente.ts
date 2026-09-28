@@ -35,7 +35,7 @@ export async function sendReportCliente(reportClient: ReportClienteProps): Promi
         }
         console.log(error.status);
         console.log(error.response);
-        Alert.alert("Não foi possível enviar o report de cliente", JSON.stringify(error));
+        Alert.alert("Não foi possível enviar o report de interdição/notificação", JSON.stringify(error));
         console.log(error);
         return false;
     }
